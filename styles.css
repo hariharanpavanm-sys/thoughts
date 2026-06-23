@@ -328,6 +328,9 @@ a:hover {
 .lock-intro-text .highlight-q {
   color: var(--text-primary);
   font-weight: 600;
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-size: 1.22rem;
 }
 .lock-intro-text .intro-focus {
   font-family: var(--font-sans);
@@ -406,6 +409,8 @@ a:hover {
   height: 0;
   overflow: hidden;
   transition: var(--transition-smooth);
+  line-height: 1.5;
+  text-align: center;
 }
 
 .login-error.show {

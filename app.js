@@ -511,12 +511,18 @@ async function handleLogin(e) {
       const logType = isSuperAdmin ? 'Admin Login' : 'Visitor Login';
       writeAccessLog(logType, `Success (Name: ${name})`);
     } else {
-      showLoginError();
+      showLoginError('Incorrect password. Please try again.');
       writeAccessLog('Visitor Login', `Blocked (Invalid Password, Name: ${name})`);
     }
   } catch (err) {
     console.error(err);
-    showLoginError();
+    if (err.name === 'TypeError' || err.message.includes('fetch')) {
+      showLoginError('System Error: Unable to access or load posts.json.enc. If you are opening index.html directly from a local file path, please run a local web server (e.g. python -m http.server 3000) due to browser CORS policies.');
+    } else if (err.name === 'OperationError' || err.message.includes('decrypt') || err.message.includes('decryption')) {
+      showLoginError('Incorrect password. Please try again.');
+    } else {
+      showLoginError('System Error: Unable to decrypt the archive. Make sure to run the python encrypt.py script.');
+    }
     writeAccessLog('Visitor Login', `Blocked (System Decryption Failure, Name: ${name})`);
   } finally {
     unlockBtn.disabled = false;
@@ -524,7 +530,12 @@ async function handleLogin(e) {
   }
 }
 
-function showLoginError() {
+function showLoginError(msg) {
+  if (msg) {
+    loginError.textContent = msg;
+  } else {
+    loginError.textContent = 'Incorrect password. Please try again.';
+  }
   loginError.classList.add('show');
   const card = document.querySelector('.lock-card');
   card.classList.add('shake');
