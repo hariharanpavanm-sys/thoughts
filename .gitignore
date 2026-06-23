@@ -1,0 +1,5 @@
+_chat.txt
+secrets.json
+config.js
+node_modules/
+.DS_Store
