@@ -376,7 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function applyConfig() {
   if (typeof BLOG_CONFIG !== 'undefined') {
     document.title = BLOG_CONFIG.title;
-    blogTitleEl.textContent = BLOG_CONFIG.title;
+    blogTitleEl.innerHTML = `${BLOG_CONFIG.title} <span class="title-separator">|</span> <span class="title-tagline">Trace the Source</span>`;
     blogSubtitleEl.textContent = BLOG_CONFIG.description;
     footerAuthorSpan.textContent = BLOG_CONFIG.author;
     if (BLOG_CONFIG.defaultPasswordPlaceholder) {
@@ -871,12 +871,12 @@ function renderPosts(postsToRender) {
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
-        <h3>No thoughts found</h3>
+        <h3>No posts found</h3>
         <p>Try searching for other keywords or terms.</p>
       </div>
     `;
     if (postCount) {
-      postCount.textContent = '0 thoughts found';
+      postCount.textContent = '0 posts found';
     }
     return;
   }

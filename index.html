@@ -1,20 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Seeker</title>
-  
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Lora:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
-  
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Lora:ital,wght@0,400..700;1,400..700&display=swap"
+    rel="stylesheet">
+
   <!-- Stylesheet -->
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body class="dark-mode">
-  
+
   <!-- Reading Progress Bar -->
   <div id="progressBar" class="progress-bar"></div>
 
@@ -23,36 +27,40 @@
     <div class="lock-card">
       <div class="lock-info">
         <div class="lock-icon-container">
-          <svg class="lock-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
-            <path d="M12 6a3.5 3.5 0 0 0-3.5 3.5c0 3.5 3.5 5.5 3.5 7.5"/>
-            <line x1="12" y1="20" x2="12.01" y2="20"/>
+          <svg class="lock-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+            <path d="M12 6a3.5 3.5 0 0 0-3.5 3.5c0 3.5 3.5 5.5 3.5 7.5" />
+            <line x1="12" y1="20" x2="12.01" y2="20" />
           </svg>
         </div>
-        
+
         <h1 class="lock-title">The Seeker</h1>
         <p class="lock-subtitle">A Private Philosophical Journal</p>
-        
+
         <div class="lock-intro-text">
-          <p class="intro-quote">Sooner or later, every sincere seeker is confronted with the question,<br><span class="highlight-q">"Who am I?"</span></p>
+          <p class="intro-quote">Sooner or later, every sincere seeker is confronted with the question,<br><span
+              class="highlight-q">"Who am I?"</span></p>
           <p class="intro-focus">Vedanta serves as a means of knowledge that unfolds.</p>
         </div>
       </div>
-      
+
       <div class="lock-form-container">
         <h2 class="lock-form-title">Seeking to Knowing</h2>
-        <p class="lock-form-desc">Provide your name and password to access the reflections.</p>
-        
+        <p class="lock-form-desc">Provide your name and password to access the journal</p>
+
         <form id="loginForm" class="login-form">
           <div class="input-group">
             <input type="text" id="visitorNameInput" placeholder="Enter your name..." required>
           </div>
           <div class="input-group">
-            <input type="password" id="passwordInput" placeholder="Enter password to unlock..." autocomplete="current-password" required>
+            <input type="password" id="passwordInput" placeholder="Enter password to unlock..."
+              autocomplete="current-password" required>
           </div>
           <button type="submit" id="unlockBtn" class="unlock-btn">
             <span>Enter</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
               <line x1="5" y1="12" x2="19" y2="12"></line>
               <polyline points="12 5 19 12 12 19"></polyline>
             </svg>
@@ -65,17 +73,18 @@
 
   <!-- BLOG APP VIEW (Initially hidden) -->
   <div id="blogApp" class="blog-app-container hidden">
-    
+
     <!-- Top Navigation Header -->
     <header class="blog-header">
       <div class="header-content">
         <div class="brand">
           <div style="display: flex; align-items: center; gap: 0.75rem;">
             <div class="brand-logo-container" title="The Seeker Logo">
-              <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
-                <path d="M12 6a3.5 3.5 0 0 0-3.5 3.5c0 3.5 3.5 5.5 3.5 7.5"/>
-                <line x1="12" y1="20" x2="12.01" y2="20"/>
+              <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+                <path d="M12 6a3.5 3.5 0 0 0-3.5 3.5c0 3.5 3.5 5.5 3.5 7.5" />
+                <line x1="12" y1="20" x2="12.01" y2="20" />
               </svg>
             </div>
             <div>
@@ -85,15 +94,16 @@
             </div>
           </div>
         </div>
-        
+
         <div class="header-actions">
           <!-- Welcome User -->
           <span id="welcomeUser" class="welcome-user"></span>
-          
+
           <!-- Light/Dark Mode Switcher -->
           <button id="themeToggle" class="icon-btn" title="Toggle Theme" aria-label="Toggle Theme">
             <!-- Sun Icon -->
-            <svg class="sun-icon hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="sun-icon hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="5"></circle>
               <line x1="12" y1="1" x2="12" y2="3"></line>
               <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -105,15 +115,17 @@
               <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
             </svg>
             <!-- Moon Icon -->
-            <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
             </svg>
           </button>
-          
+
           <!-- Logout Button -->
           <button id="logoutBtn" class="logout-btn" title="Logout Journal">
             <span>Logout</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
               <polyline points="16 17 21 12 16 7"></polyline>
               <line x1="21" y1="12" x2="9" y2="12"></line>
@@ -126,40 +138,47 @@
     <!-- Standalone Banner Alert -->
     <div class="banner-section">
       <div id="standaloneBanner" class="standalone-banner hidden">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"></circle>
           <line x1="12" y1="8" x2="12" y2="12"></line>
           <line x1="12" y1="16" x2="12.01" y2="16"></line>
         </svg>
-        <span>Running in Standalone Mode. Comments and likes are saved in your local browser only. To sync them and track analytics, configure your Google Sheets backend URL.</span>
+        <span>Running in Standalone Mode. Comments and likes are saved in your local browser only. To sync them and
+          track analytics, configure your Google Sheets backend URL.</span>
       </div>
     </div>
 
     <!-- MAIN THREE-COLUMN LAYOUT -->
     <div class="blog-layout-container">
       <div class="blog-layout">
-        
+
         <!-- Left Sidebar: Navigation Menu -->
         <nav class="blog-nav">
           <div class="nav-links">
             <button id="navFeedBtn" class="nav-item active" title="Journal Thoughts">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
                 <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
               </svg>
               <span>Journal Feed</span>
             </button>
-            
+
             <button id="navFeedbackBtn" class="nav-item" title="Leave Reflections">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
               </svg>
               <span>Leave Reflections</span>
             </button>
-            
+
             <button id="navAdminBtn" class="nav-item hidden" title="Super Admin Insights">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                </path>
                 <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
                 <line x1="12" y1="22.08" x2="12" y2="12"></line>
               </svg>
@@ -170,24 +189,26 @@
 
         <!-- Center: Dynamic Views (Feed / Feedback / Admin) -->
         <main class="main-content">
-          
+
           <!-- VIEW 1: JOURNAL FEED VIEW -->
           <div id="feedView" class="view-section">
             <!-- Search Bar (Now prominently at the top of the feed) -->
             <div class="search-widget-top">
               <div class="search-wrapper">
-                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="11" cy="11" r="8"></circle>
                   <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
-                <input type="text" id="searchInput" placeholder="Search keywords, posts, or tags..." aria-label="Search posts">
+                <input type="text" id="searchInput" placeholder="Search keywords, posts, or tags..."
+                  aria-label="Search posts">
               </div>
             </div>
-            
+
             <!-- Tags Category Navigation -->
             <div class="tags-widget-top">
               <div class="tags-list">
-                <button class="tag-pill active" data-tag="all">All Thoughts</button>
+                <button class="tag-pill active" data-tag="all">All Posts</button>
                 <button class="tag-pill" data-tag="Ishvara">Ishvara</button>
                 <button class="tag-pill" data-tag="Consciousness">Consciousness</button>
                 <button class="tag-pill" data-tag="Prarabdha">Prarabdha</button>
@@ -223,16 +244,17 @@
           <div id="feedbackView" class="view-section hidden">
             <div class="feedback-portal-container">
               <h2>Reflections & Insights</h2>
-              <p class="section-subtitle">Share your understanding, notes, or reflections on these philosophical journals.</p>
-              
+              <p class="section-subtitle">Share your understanding, notes, or reflections on these philosophical
+                journals.</p>
+
               <!-- Feedback Input Form -->
               <form id="feedbackForm" class="comment-form feedback-form-box">
                 <h4>Leave your reflections</h4>
-                
+
                 <div class="form-row">
                   <input type="text" id="feedbackAuthor" placeholder="Your name..." required>
                 </div>
-                
+
                 <div class="form-row feedback-rating-row">
                   <span class="rating-label">Your Rating:</span>
                   <div class="star-rating" id="feedbackStars">
@@ -243,11 +265,12 @@
                     <span class="star" data-value="1">&#9733;</span>
                   </div>
                 </div>
-                
+
                 <div class="form-row">
-                  <textarea id="feedbackText" rows="4" placeholder="Write your reflections or insights here..." required></textarea>
+                  <textarea id="feedbackText" rows="4" placeholder="Write your reflections or insights here..."
+                    required></textarea>
                 </div>
-                
+
                 <button type="submit" class="submit-comment-btn">Submit Reflections</button>
               </form>
 
@@ -266,36 +289,46 @@
           <div id="adminView" class="view-section hidden">
             <div class="admin-dashboard-view">
               <header class="admin-dashboard-header">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 1rem;">
+                <div
+                  style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 1rem;">
                   <h2>Super Admin Dashboard</h2>
-                  <button id="exitAdminModeBtn" class="delete-btn" title="Exit Admin View and Hide Admin Buttons" style="padding: 0.5rem 1rem; font-size: 0.85rem;">Exit Admin Mode</button>
+                  <button id="exitAdminModeBtn" class="delete-btn" title="Exit Admin View and Hide Admin Buttons"
+                    style="padding: 0.5rem 1rem; font-size: 0.85rem;">Exit Admin Mode</button>
                 </div>
                 <p class="admin-dashboard-subtitle">Visitor analytics and real-time security access logs.</p>
               </header>
 
               <!-- Add New Post Form (Only visible to admin) -->
-              <div id="adminPublishSection" class="dashboard-table-container admin-publish-section" style="margin-bottom: 3rem;">
+              <div id="adminPublishSection" class="dashboard-table-container admin-publish-section"
+                style="margin-bottom: 3rem;">
                 <h3>Publish a New Thought</h3>
                 <form id="adminPublishForm" class="comment-form feedback-form-box" style="margin-top: 1rem;">
                   <div class="form-row">
                     <input type="text" id="postTitleInput" placeholder="Title of reflection..." required>
                   </div>
                   <div class="form-row">
-                    <textarea id="postContentInput" rows="6" placeholder="Write your philosophical thought, camp notes or reflection here..." required></textarea>
+                    <textarea id="postContentInput" rows="6"
+                      placeholder="Write your philosophical thought, camp notes or reflection here..."
+                      required></textarea>
                   </div>
-                  <button type="submit" class="submit-comment-btn" style="background-color: var(--accent); color: #0b0f19;">Publish Reflection</button>
+                  <button type="submit" class="submit-comment-btn"
+                    style="background-color: var(--accent); color: #0b0f19;">Publish Reflection</button>
                 </form>
               </div>
 
               <!-- Manage User Password Form (Only visible to admin) -->
-              <div id="adminPasswordSection" class="dashboard-table-container admin-publish-section" style="margin-bottom: 3rem;">
+              <div id="adminPasswordSection" class="dashboard-table-container admin-publish-section"
+                style="margin-bottom: 3rem;">
                 <h3>Manage Journal Password</h3>
-                <p class="admin-dashboard-subtitle" style="margin-top: 0.25rem; margin-bottom: 1rem;">Update the password that regular users must enter to unlock the journal.</p>
+                <p class="admin-dashboard-subtitle" style="margin-top: 0.25rem; margin-bottom: 1rem;">Update the
+                  password that regular users must enter to unlock the journal.</p>
                 <form id="adminPasswordForm" class="comment-form feedback-form-box">
                   <div class="form-row">
-                    <input type="password" id="newRegularPasswordInput" placeholder="Enter new regular user password..." required autocomplete="new-password">
+                    <input type="password" id="newRegularPasswordInput" placeholder="Enter new regular user password..."
+                      required autocomplete="new-password">
                   </div>
-                  <button type="submit" class="submit-comment-btn" style="background-color: var(--accent); color: #0b0f19;">Update User Password</button>
+                  <button type="submit" class="submit-comment-btn"
+                    style="background-color: var(--accent); color: #0b0f19;">Update User Password</button>
                 </form>
               </div>
 
@@ -346,7 +379,9 @@
                       </tr>
                     </thead>
                     <tbody id="adminPostViewsTableBody">
-                      <tr><td colspan="5" class="text-center">Loading views metrics...</td></tr>
+                      <tr>
+                        <td colspan="5" class="text-center">Loading views metrics...</td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>
@@ -369,12 +404,14 @@
                         </tr>
                       </thead>
                       <tbody id="adminLogsTableBody">
-                        <tr><td colspan="5" class="text-center">Loading logs...</td></tr>
+                        <tr>
+                          <td colspan="5" class="text-center">Loading logs...</td>
+                        </tr>
                       </tbody>
                     </table>
                   </div>
                 </div>
-                
+
                 <!-- Comments Moderation -->
                 <div class="dashboard-table-container">
                   <h3>Active Comments Moderation</h3>
@@ -389,7 +426,9 @@
                         </tr>
                       </thead>
                       <tbody id="adminCommentsTableBody">
-                        <tr><td colspan="4" class="text-center">Loading comments...</td></tr>
+                        <tr>
+                          <td colspan="4" class="text-center">Loading comments...</td>
+                        </tr>
                       </tbody>
                     </table>
                   </div>
@@ -402,7 +441,7 @@
 
         <!-- Right Sidebar: Widgets -->
         <aside class="blog-sidebar">
-          
+
           <!-- Profile Widget -->
           <div class="sidebar-widget profile-widget">
             <div class="profile-avatar">H</div>
@@ -415,7 +454,7 @@
             <h4 class="widget-title">Journal Insights</h4>
             <div class="stats-list">
               <div class="stat-item">
-                <span class="stat-label">Total Thoughts</span>
+                <span class="stat-label">Total Posts</span>
                 <span class="stat-value" id="statPostCount">0</span>
               </div>
               <div class="stat-item">
@@ -424,7 +463,7 @@
               </div>
             </div>
           </div>
-          
+
         </aside>
 
       </div>
@@ -443,12 +482,13 @@
   <div id="readingModal" class="modal-overlay hidden">
     <div class="modal-container">
       <button id="modalCloseBtn" class="modal-close-btn" aria-label="Close Reader">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="6" x2="6" y2="18"></line>
           <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
       </button>
-      
+
       <article class="modal-article">
         <header class="modal-article-header">
           <div class="modal-meta">
@@ -456,26 +496,30 @@
             <span class="meta-dot">&bull;</span>
             <span id="modalReadTime"></span>
             <span class="meta-dot">&bull;</span>
-            
+
             <!-- Font Size Adjuster -->
             <div class="font-size-adjuster" title="Adjust text size">
               <button id="fontSizeDecBtn" class="size-btn" aria-label="Decrease font size">A-</button>
               <button id="fontSizeIncBtn" class="size-btn" aria-label="Increase font size">A+</button>
             </div>
-            
+
             <div class="modal-meta-actions">
               <!-- Modal Share Button -->
               <button id="modalShareBtn" class="modal-share-btn" title="Copy Link to Inquiry">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
                   <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                   <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                 </svg>
               </button>
-              
+
               <!-- Modal Like Button -->
               <button id="modalLikeBtn" class="modal-like-btn" title="Like post">
-                <svg class="heart-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                <svg class="heart-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path
+                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                  </path>
                 </svg>
                 <span id="modalLikeCount">0</span>
               </button>
@@ -483,7 +527,7 @@
           </div>
           <h2 id="modalTitle" class="modal-title"></h2>
         </header>
-        
+
         <div id="modalContent" class="modal-body-content">
           <!-- Full post content gets dynamically loaded here -->
         </div>
@@ -492,7 +536,7 @@
         <hr class="modal-separator">
         <section class="comments-section">
           <h3>Reflections (<span id="commentCount">0</span>)</h3>
-          
+
           <!-- Comments List -->
           <div id="commentsList" class="comments-list">
             <!-- Dynamic comments here -->
@@ -513,10 +557,11 @@
       </article>
     </div>
   </div>
-  
+
   <!-- Scroll to Top Button -->
   <button id="scrollToTopBtn" class="scroll-to-top-btn" aria-label="Scroll to Top" title="Scroll to Top">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+      stroke-linecap="round" stroke-linejoin="round">
       <polyline points="18 15 12 9 6 15"></polyline>
     </svg>
   </button>
@@ -525,4 +570,5 @@
   <script src="config.js"></script>
   <script src="app.js"></script>
 </body>
+
 </html>
