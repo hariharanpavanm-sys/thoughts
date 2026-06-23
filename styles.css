@@ -271,17 +271,28 @@ a:hover {
 }
 
 .lock-intro-text {
-  font-family: var(--font-serif);
-  font-size: 1.02rem;
-  line-height: 1.7;
+  font-family: var(--font-serif-body);
+  font-size: 1.12rem;
+  line-height: 1.8;
   color: var(--text-secondary);
-  margin-bottom: 0;
+  margin: 2.2rem auto 0;
   text-align: center;
-  padding: 0 0.5rem;
-  font-style: italic;
+  padding: 2rem 0 0;
+  position: relative;
+  max-width: 340px;
+  border-top: 1px solid var(--card-border);
   opacity: 0.95;
-  border-left: 2px solid rgba(var(--accent-rgb), 0.2);
-  border-right: 2px solid rgba(var(--accent-rgb), 0.2);
+}
+.lock-intro-text::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 2px;
+  background-color: var(--accent);
+  opacity: 0.3;
 }
 
 /* Responsive lock card layout for mobile */
@@ -303,18 +314,30 @@ a:hover {
   }
 }
 .lock-intro-text p {
-  margin-bottom: 0.75rem;
+  margin-bottom: 1.25rem;
 }
 .lock-intro-text p:last-child {
   margin-bottom: 0;
 }
-.lock-intro-text .intro-focus {
-  font-weight: 500;
-  color: var(--accent);
-  font-family: var(--font-sans);
+.lock-intro-text .intro-quote {
+  font-family: var(--font-serif-body);
+  font-weight: 400;
+  color: var(--text-secondary);
   font-style: normal;
-  font-size: 0.98rem;
-  letter-spacing: 0.5px;
+}
+.lock-intro-text .highlight-q {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.lock-intro-text .intro-focus {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-top: 0.75rem;
+  font-style: normal;
 }
 
 .login-form {
@@ -1500,6 +1523,32 @@ blockquote {
   .blog-nav {
     position: sticky;
     top: calc(80px + 2.5rem);
+    height: calc(100vh - 180px);
+    display: flex;
+    flex-direction: column;
+  }
+}
+.sidebar-footer {
+  margin-top: auto;
+  padding: 1.5rem 0.5rem 0.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  opacity: 0.5;
+  border-top: 1px solid var(--card-border);
+  text-align: center;
+  transition: var(--transition-smooth);
+}
+.sidebar-footer:hover {
+  opacity: 0.95;
+  color: var(--accent);
+}
+@media (max-width: 899px) {
+  .sidebar-footer {
+    display: none;
   }
 }
 .nav-links {

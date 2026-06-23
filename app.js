@@ -458,7 +458,7 @@ async function checkSavedSession() {
       passwordInput.value = '';
     } finally {
       unlockBtn.disabled = false;
-      unlockBtn.querySelector('span').textContent = 'Seeking to Knowing';
+      unlockBtn.querySelector('span').textContent = 'Enter';
     }
   }
 }
@@ -520,7 +520,7 @@ async function handleLogin(e) {
     writeAccessLog('Visitor Login', `Blocked (System Decryption Failure, Name: ${name})`);
   } finally {
     unlockBtn.disabled = false;
-    unlockBtn.querySelector('span').textContent = 'Seeking to Knowing';
+    unlockBtn.querySelector('span').textContent = 'Enter';
   }
 }
 
