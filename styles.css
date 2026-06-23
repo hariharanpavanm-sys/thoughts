@@ -229,10 +229,38 @@ a:hover {
 .lock-subtitle {
   color: var(--text-secondary);
   font-size: 0.9rem;
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
   font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 2px;
+}
+
+.lock-intro-text {
+  font-family: var(--font-serif);
+  font-size: 0.98rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin-bottom: 2.25rem;
+  text-align: center;
+  padding: 0 0.5rem;
+  font-style: italic;
+  opacity: 0.95;
+  border-left: 2px solid rgba(var(--accent-rgb), 0.2);
+  border-right: 2px solid rgba(var(--accent-rgb), 0.2);
+}
+.lock-intro-text p {
+  margin-bottom: 0.75rem;
+}
+.lock-intro-text p:last-child {
+  margin-bottom: 0;
+}
+.lock-intro-text .intro-focus {
+  font-weight: 500;
+  color: var(--accent);
+  font-family: var(--font-sans);
+  font-style: normal;
+  font-size: 0.92rem;
+  letter-spacing: 0.2px;
 }
 
 .login-form {

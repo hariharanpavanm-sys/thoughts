@@ -32,6 +32,11 @@
       <h1 class="lock-title">Thoughts & Values</h1>
       <p class="lock-subtitle">A Private Philosophical Journal</p>
       
+      <div class="lock-intro-text">
+        <p>The seeking of the <strong>"Who Am I"</strong> question is something every thinking person faces once in a lifetime.</p>
+        <p class="intro-focus">Vedanta as the language reflects the understanding on solving the purpose of the human life.</p>
+      </div>
+      
       <form id="loginForm" class="login-form">
         <div class="input-group">
           <input type="text" id="visitorNameInput" placeholder="Enter your name..." required>
@@ -130,11 +135,11 @@
               <span>Journal Feed</span>
             </button>
             
-            <button id="navFeedbackBtn" class="nav-item" title="Leave Feedback">
+            <button id="navFeedbackBtn" class="nav-item" title="Leave Reflections">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
               </svg>
-              <span>Feedback Portal</span>
+              <span>Leave Reflections</span>
             </button>
             
             <button id="navAdminBtn" class="nav-item hidden" title="Super Admin Insights">
@@ -188,15 +193,15 @@
             </div>
           </div>
 
-          <!-- VIEW 2: FEEDBACK PORTAL VIEW -->
+          <!-- VIEW 2: REFLECTIONS PORTAL VIEW -->
           <div id="feedbackView" class="view-section hidden">
             <div class="feedback-portal-container">
-              <h2>Feedback & Reflections Portal</h2>
-              <p class="section-subtitle">Share your insights, notes, or feedback on these philosophical journals.</p>
+              <h2>Reflections & Insights</h2>
+              <p class="section-subtitle">Share your understanding, notes, or reflections on these philosophical journals.</p>
               
               <!-- Feedback Input Form -->
               <form id="feedbackForm" class="comment-form feedback-form-box">
-                <h4>Leave Feedback</h4>
+                <h4>Leave your reflections</h4>
                 
                 <div class="form-row">
                   <input type="text" id="feedbackAuthor" placeholder="Your name..." required>
@@ -214,18 +219,18 @@
                 </div>
                 
                 <div class="form-row">
-                  <textarea id="feedbackText" rows="4" placeholder="Write your comments or feedback here..." required></textarea>
+                  <textarea id="feedbackText" rows="4" placeholder="Write your reflections or insights here..." required></textarea>
                 </div>
                 
-                <button type="submit" class="submit-comment-btn">Submit Feedback</button>
+                <button type="submit" class="submit-comment-btn">Submit Reflections</button>
               </form>
 
               <!-- Feedback Review List -->
               <div class="feedback-list-container">
-                <h3>Visitor Feedback</h3>
+                <h3>Visitor Reflections</h3>
                 <div id="feedbackList" class="comments-list">
-                  <!-- Dynamic feedback review cards -->
-                  <p class="loading-state">Loading feedback...</p>
+                  <!-- Dynamic reflections cards -->
+                  <p class="loading-state">Loading reflections...</p>
                 </div>
               </div>
             </div>
@@ -241,6 +246,20 @@
                 </div>
                 <p class="admin-dashboard-subtitle">Visitor analytics and real-time security access logs.</p>
               </header>
+
+              <!-- Add New Post Form (Only visible to admin) -->
+              <div id="adminPublishSection" class="dashboard-table-container admin-publish-section" style="margin-bottom: 3rem;">
+                <h3>Publish a New Thought</h3>
+                <form id="adminPublishForm" class="comment-form feedback-form-box" style="margin-top: 1rem;">
+                  <div class="form-row">
+                    <input type="text" id="postTitleInput" placeholder="Title of reflection..." required>
+                  </div>
+                  <div class="form-row">
+                    <textarea id="postContentInput" rows="6" placeholder="Write your philosophical thought, camp notes or reflection here..." required></textarea>
+                  </div>
+                  <button type="submit" class="submit-comment-btn" style="background-color: var(--accent); color: #0b0f19;">Publish Reflection</button>
+                </form>
+              </div>
 
               <!-- Stats Counter Row -->
               <div class="analytics-grid">
