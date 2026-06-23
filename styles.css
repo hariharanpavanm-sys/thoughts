@@ -1528,32 +1528,6 @@ blockquote {
   .blog-nav {
     position: sticky;
     top: calc(80px + 2.5rem);
-    height: calc(100vh - 180px);
-    display: flex;
-    flex-direction: column;
-  }
-}
-.sidebar-footer {
-  margin-top: auto;
-  padding: 1.5rem 0.5rem 0.5rem;
-  font-family: var(--font-sans);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  opacity: 0.5;
-  border-top: 1px solid var(--card-border);
-  text-align: center;
-  transition: var(--transition-smooth);
-}
-.sidebar-footer:hover {
-  opacity: 0.95;
-  color: var(--accent);
-}
-@media (max-width: 899px) {
-  .sidebar-footer {
-    display: none;
   }
 }
 .nav-links {
@@ -2028,4 +2002,9 @@ blockquote {
 
 .sort-widget select:focus {
   border-color: var(--accent);
+}
+
+.sort-widget select option {
+  background-color: var(--card-bg);
+  color: var(--text-primary);
 }
