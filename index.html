@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thoughts & Values</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark-mode">
+  
+  <!-- Reading Progress Bar -->
+  <div id="progressBar" class="progress-bar"></div>
+
+  <!-- LOCK SCREEN / LOGIN VIEW -->
+  <div id="lockScreen" class="lock-screen-container">
+    <div class="lock-card">
+      <div class="lock-icon-container">
+        <svg class="lock-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+          <path d="M12 6a3.5 3.5 0 0 0-3.5 3.5c0 3.5 3.5 5.5 3.5 7.5"/>
+          <line x1="12" y1="20" x2="12.01" y2="20"/>
+        </svg>
+      </div>
+      
+      <h1 class="lock-title">Thoughts & Values</h1>
+      <p class="lock-subtitle">A Private Philosophical Journal</p>
+      
+      <form id="loginForm" class="login-form">
+        <div class="input-group">
+          <input type="text" id="visitorNameInput" placeholder="Enter your name..." required>
+        </div>
+        <div class="input-group">
+          <input type="password" id="passwordInput" placeholder="Enter password to unlock..." autocomplete="current-password" required>
+        </div>
+        <button type="submit" id="unlockBtn" class="unlock-btn">
+          <span>Unlock Journal</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      </form>
+      <div id="loginError" class="login-error">Incorrect password. Please try again.</div>
+    </div>
+  </div>
+
+  <!-- BLOG APP VIEW (Initially hidden) -->
+  <div id="blogApp" class="blog-app-container hidden">
+    
+    <!-- Top Navigation Header -->
+    <header class="blog-header">
+      <div class="header-content">
+        <div class="brand">
+          <h1 id="blogTitle">Thoughts & Values</h1>
+          <p id="blogSubtitle" class="subtitle">A Private Journal</p>
+        </div>
+        
+        <div class="header-actions">
+          <!-- Light/Dark Mode Switcher -->
+          <button id="themeToggle" class="icon-btn" title="Toggle Theme" aria-label="Toggle Theme">
+            <!-- Sun Icon -->
+            <svg class="sun-icon hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <!-- Moon Icon -->
+            <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+          
+          <!-- Settings Button -->
+          <button id="settingsToggle" class="icon-btn" title="Settings / Tools" aria-label="Settings">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
+          
+          <!-- Logout Button -->
+          <button id="logoutBtn" class="logout-btn" title="Lock Journal">
+            <span>Lock</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Standalone Banner Alert -->
+    <div class="banner-section">
+      <div id="standaloneBanner" class="standalone-banner hidden">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span>Running in Standalone Mode. Comments and likes are saved in your local browser only. To sync them and track analytics, configure your Google Sheets backend URL.</span>
+      </div>
+    </div>
+
+    <!-- MAIN THREE-COLUMN LAYOUT -->
+    <div class="blog-layout-container">
+      <div class="blog-layout">
+        
+        <!-- Left Sidebar: Navigation Menu -->
+        <nav class="blog-nav">
+          <div class="nav-links">
+            <button id="navFeedBtn" class="nav-item active" title="Journal Thoughts">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+              <span>Journal Feed</span>
+            </button>
+            
+            <button id="navFeedbackBtn" class="nav-item" title="Leave Feedback">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+              <span>Feedback Portal</span>
+            </button>
+            
+            <button id="navAdminBtn" class="nav-item hidden" title="Super Admin Insights">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+              </svg>
+              <span>Admin Insights</span>
+            </button>
+          </div>
+        </nav>
+
+        <!-- Center: Dynamic Views (Feed / Feedback / Admin) -->
+        <main class="main-content">
+          
+          <!-- VIEW 1: JOURNAL FEED VIEW -->
+          <div id="feedView" class="view-section">
+            <!-- Search Bar (Now prominently at the top of the feed) -->
+            <div class="search-widget-top">
+              <div class="search-wrapper">
+                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="searchInput" placeholder="Search keywords, posts, or tags..." aria-label="Search posts">
+              </div>
+            </div>
+            
+            <!-- Tags Category Navigation -->
+            <div class="tags-widget-top">
+              <div class="tags-list">
+                <button class="tag-pill active" data-tag="all">All Thoughts</button>
+                <button class="tag-pill" data-tag="Ishvara">Ishvara</button>
+                <button class="tag-pill" data-tag="Consciousness">Consciousness</button>
+                <button class="tag-pill" data-tag="Prarabdha">Prarabdha</button>
+                <button class="tag-pill" data-tag="Silence">Silence</button>
+                <button class="tag-pill" data-tag="Japa">Japa</button>
+                <button class="tag-pill" data-tag="Space">Space</button>
+                <button class="tag-pill" data-tag="Guru">Guru</button>
+              </div>
+            </div>
+
+            <!-- Feed Post List -->
+            <div id="postCount" class="post-count-label"></div>
+            <div id="postsContainer" class="posts-container">
+              <div class="loading-state">
+                <div class="spinner"></div>
+                <p>Decrypting and loading journal entries...</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- VIEW 2: FEEDBACK PORTAL VIEW -->
+          <div id="feedbackView" class="view-section hidden">
+            <div class="feedback-portal-container">
+              <h2>Feedback & Reflections Portal</h2>
+              <p class="section-subtitle">Share your insights, notes, or feedback on these philosophical journals.</p>
+              
+              <!-- Feedback Input Form -->
+              <form id="feedbackForm" class="comment-form feedback-form-box">
+                <h4>Leave Feedback</h4>
+                
+                <div class="form-row">
+                  <input type="text" id="feedbackAuthor" placeholder="Your name..." required>
+                </div>
+                
+                <div class="form-row feedback-rating-row">
+                  <span class="rating-label">Your Rating:</span>
+                  <div class="star-rating" id="feedbackStars">
+                    <span class="star" data-value="5">&#9733;</span>
+                    <span class="star" data-value="4">&#9733;</span>
+                    <span class="star" data-value="3">&#9733;</span>
+                    <span class="star" data-value="2">&#9733;</span>
+                    <span class="star" data-value="1">&#9733;</span>
+                  </div>
+                </div>
+                
+                <div class="form-row">
+                  <textarea id="feedbackText" rows="4" placeholder="Write your comments or feedback here..." required></textarea>
+                </div>
+                
+                <button type="submit" class="submit-comment-btn">Submit Feedback</button>
+              </form>
+
+              <!-- Feedback Review List -->
+              <div class="feedback-list-container">
+                <h3>Visitor Feedback</h3>
+                <div id="feedbackList" class="comments-list">
+                  <!-- Dynamic feedback review cards -->
+                  <p class="loading-state">Loading feedback...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VIEW 3: INLINE ADMIN INSIGHTS VIEW -->
+          <div id="adminView" class="view-section hidden">
+            <div class="admin-dashboard-view">
+              <header class="admin-dashboard-header">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 1rem;">
+                  <h2>Super Admin Dashboard</h2>
+                  <button id="exitAdminModeBtn" class="delete-btn" title="Exit Admin View and Hide Admin Buttons" style="padding: 0.5rem 1rem; font-size: 0.85rem;">Exit Admin Mode</button>
+                </div>
+                <p class="admin-dashboard-subtitle">Visitor analytics and real-time security access logs.</p>
+              </header>
+
+              <!-- Stats Counter Row -->
+              <div class="analytics-grid">
+                <div class="analytics-card">
+                  <span class="card-label">Total Logs</span>
+                  <span class="card-val" id="statTotalLogs">0</span>
+                </div>
+                <div class="analytics-card">
+                  <span class="card-label">Successful Logins</span>
+                  <span class="card-val text-success" id="statSuccessLogins">0</span>
+                </div>
+                <div class="analytics-card">
+                  <span class="card-label">Blocked Attempts</span>
+                  <span class="card-val text-error" id="statBlockedLogins">0</span>
+                </div>
+                <div class="analytics-card">
+                  <span class="card-label">Total Views</span>
+                  <span class="card-val text-info" id="statTotalViews" style="color: #60a5fa;">0</span>
+                </div>
+                <div class="analytics-card">
+                  <span class="card-label">Unique Visitors</span>
+                  <span class="card-val text-warning" id="statUniqueVisitors" style="color: #fbbf24;">0</span>
+                </div>
+                <div class="analytics-card">
+                  <span class="card-label">Total Likes Given</span>
+                  <span class="card-val" id="statTotalLikes">0</span>
+                </div>
+                <div class="analytics-card">
+                  <span class="card-label">Comments</span>
+                  <span class="card-val" id="statTotalComments">0</span>
+                </div>
+              </div>
+
+              <!-- Post View Stats Table -->
+              <div class="dashboard-table-container" style="margin-bottom: 3rem;">
+                <h3>Post Insights & Page Views</h3>
+                <div class="table-scroll">
+                  <table class="dashboard-table">
+                    <thead>
+                      <tr>
+                        <th>Post ID</th>
+                        <th>Title</th>
+                        <th>Date Published</th>
+                        <th>Total Page Views</th>
+                        <th>Unique Viewers</th>
+                      </tr>
+                    </thead>
+                    <tbody id="adminPostViewsTableBody">
+                      <tr><td colspan="5" class="text-center">Loading views metrics...</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Logs & Comments Sections -->
+              <div class="dashboard-sections">
+                <!-- Access Logs Table -->
+                <div class="dashboard-table-container">
+                  <h3>Recent Security Access Logs</h3>
+                  <div class="table-scroll">
+                    <table class="dashboard-table">
+                      <thead>
+                        <tr>
+                          <th>Timestamp</th>
+                          <th>User</th>
+                          <th>Activity</th>
+                          <th>Session ID</th>
+                          <th>Browser Traceback</th>
+                        </tr>
+                      </thead>
+                      <tbody id="adminLogsTableBody">
+                        <tr><td colspan="5" class="text-center">Loading logs...</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                
+                <!-- Comments Moderation -->
+                <div class="dashboard-table-container">
+                  <h3>Active Comments Moderation</h3>
+                  <div class="table-scroll">
+                    <table class="dashboard-table">
+                      <thead>
+                        <tr>
+                          <th>Post ID</th>
+                          <th>Author</th>
+                          <th>Comment</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody id="adminCommentsTableBody">
+                        <tr><td colspan="4" class="text-center">Loading comments...</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </main>
+
+        <!-- Right Sidebar: Widgets -->
+        <aside class="blog-sidebar">
+          
+          <!-- Profile Widget -->
+          <div class="sidebar-widget profile-widget">
+            <div class="profile-avatar">H</div>
+            <h3 class="profile-name">Hari</h3>
+            <p class="profile-bio">Reflections on Vedanta camp notebooks, philosophical inquiries into the nature of self-consciousness, Ishvara, and the absolute standpoint.</p>
+          </div>
+
+          <!-- Stats Widget -->
+          <div class="sidebar-widget stats-widget">
+            <h4 class="widget-title">Journal Insights</h4>
+            <div class="stats-list">
+              <div class="stat-item">
+                <span class="stat-label">Total Thoughts</span>
+                <span class="stat-value" id="statPostCount">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Status</span>
+                <span class="stat-value text-success">Active & Private</span>
+              </div>
+            </div>
+          </div>
+          
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="blog-footer">
+      <div class="footer-content">
+        <p>&copy; <span id="currentYear"></span> <span id="footerAuthor">Hari</span>. All rights reserved.</p>
+        <p class="tagline">The self is free, unaffected and untouched. Reflecting the oneness.</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- FOCUSED READING MODAL -->
+  <div id="readingModal" class="modal-overlay hidden">
+    <div class="modal-container">
+      <button id="modalCloseBtn" class="modal-close-btn" aria-label="Close Reader">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      
+      <article class="modal-article">
+        <header class="modal-article-header">
+          <div class="modal-meta">
+            <span id="modalDate"></span>
+            <span class="meta-dot">&bull;</span>
+            <span id="modalReadTime"></span>
+            <span class="meta-dot">&bull;</span>
+            <!-- Modal Like Button -->
+            <button id="modalLikeBtn" class="modal-like-btn" title="Like post">
+              <svg class="heart-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+              <span id="modalLikeCount">0</span>
+            </button>
+          </div>
+          <h2 id="modalTitle" class="modal-title"></h2>
+        </header>
+        
+        <div id="modalContent" class="modal-body-content">
+          <!-- Full post content gets dynamically loaded here -->
+        </div>
+
+        <!-- Interactive Comments Section -->
+        <hr class="modal-separator">
+        <section class="comments-section">
+          <h3>Reflections (<span id="commentCount">0</span>)</h3>
+          
+          <!-- Comments List -->
+          <div id="commentsList" class="comments-list">
+            <!-- Dynamic comments here -->
+          </div>
+
+          <!-- Add Comment Form -->
+          <form id="commentForm" class="comment-form">
+            <h4>Add your reflection</h4>
+            <div class="form-row">
+              <input type="text" id="commentAuthor" placeholder="Your name..." required>
+            </div>
+            <div class="form-row">
+              <textarea id="commentText" rows="3" placeholder="Write your thoughts..." required></textarea>
+            </div>
+            <button type="submit" class="submit-comment-btn">Submit Comment</button>
+          </form>
+        </section>
+      </article>
+    </div>
+  </div>
+
+
+
+  <!-- SETTINGS DRAWER -->
+  <div id="settingsDrawer" class="drawer-overlay hidden">
+    <div class="drawer-container">
+      <div class="drawer-header">
+        <h3>Journal Settings & Tools</h3>
+        <button id="settingsCloseBtn" class="drawer-close-btn" aria-label="Close Settings">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="drawer-body">
+        <section class="drawer-section">
+          <h4>Password Hash Generator</h4>
+          <p class="drawer-desc">Need to change your passwords? Enter your password below, generate the SHA-256 hash, and copy it into your local configuration file.</p>
+          
+          <div class="tool-group">
+            <label for="newPasswordInput">Password Text</label>
+            <div class="input-row">
+              <input type="text" id="newPasswordInput" placeholder="Type password here...">
+              <button id="generateHashBtn" class="primary-btn">Generate</button>
+            </div>
+          </div>
+          
+          <div id="hashResultWrapper" class="tool-group hidden">
+            <label for="hashResultOutput">SHA-256 Hash</label>
+            <div class="input-row">
+              <input type="text" id="hashResultOutput" readonly>
+              <button id="copyHashBtn" class="secondary-btn">Copy</button>
+            </div>
+            <p class="copied-msg hidden" id="copiedMsg">Copied to clipboard!</p>
+          </div>
+        </section>
+        
+        <section class="drawer-section">
+          <h4>Workflow Guide</h4>
+          <p class="drawer-desc">Follow these steps to update your private blog:</p>
+          <ol class="guide-list">
+            <li>Open the local file <code>_chat.txt</code> in your workspace.</li>
+            <li>Write your new thoughts, notes, or append chat messages.</li>
+            <li>Save the file and run the encryption command locally:
+              <pre><code>python encrypt.py</code></pre>
+            </li>
+            <li>Commit the updated <code>posts.json.enc</code> file to your public GitHub repository and push:
+              <pre><code>git add posts.json.enc
+git commit -m "Update thoughts"
+git push</code></pre>
+            </li>
+            <li>Your live site will fetch the new thoughts and decrypt them dynamically using your password!</li>
+          </ol>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- Config and Application Logic Scripts -->
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
