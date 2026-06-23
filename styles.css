@@ -191,7 +191,7 @@ a:hover {
 
 .lock-card {
   width: 100%;
-  max-width: 960px;
+  max-width: 1080px;
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   backdrop-filter: blur(24px);
@@ -205,7 +205,7 @@ a:hover {
 
 .lock-info {
   flex: 1.1;
-  padding: 4.5rem 3.5rem;
+  padding: 5.5rem 4.5rem;
   text-align: center;
   border-right: 1px solid var(--card-border);
   display: flex;
@@ -217,7 +217,7 @@ a:hover {
 
 .lock-form-container {
   flex: 0.9;
-  padding: 4.5rem 3.5rem;
+  padding: 5.5rem 4.5rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -272,8 +272,8 @@ a:hover {
 
 .lock-intro-text {
   font-family: var(--font-serif);
-  font-size: 0.98rem;
-  line-height: 1.65;
+  font-size: 1.02rem;
+  line-height: 1.7;
   color: var(--text-secondary);
   margin-bottom: 0;
   text-align: center;
@@ -313,8 +313,8 @@ a:hover {
   color: var(--accent);
   font-family: var(--font-sans);
   font-style: normal;
-  font-size: 0.92rem;
-  letter-spacing: 0.2px;
+  font-size: 0.98rem;
+  letter-spacing: 0.5px;
 }
 
 .login-form {
@@ -437,10 +437,12 @@ a:hover {
 }
 
 .brand .subtitle {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  font-weight: 300;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-weight: 400;
   letter-spacing: 0.5px;
+  margin-top: 0.15rem;
+  line-height: 1.5;
 }
 
 .brand-logo-container {
@@ -1002,6 +1004,58 @@ blockquote {
   .modal-close-btn {
     top: 1rem;
     right: 1rem;
+  }
+  
+  /* Phone-based styling optimizations */
+  .blog-layout-container {
+    padding: 1.25rem 0.75rem 3.5rem;
+  }
+  
+  .post-card {
+    padding: 1.5rem;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .post-title {
+    font-size: 1.65rem;
+  }
+  
+  .post-excerpt {
+    font-size: 1.05rem;
+    line-height: 1.75;
+  }
+  
+  .brand h1 {
+    font-size: 1.4rem;
+  }
+  
+  .brand-logo-container {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .header-content {
+    padding: 1rem 0.75rem;
+  }
+  
+  .welcome-user {
+    display: none !important; /* Hide visitor name to prevent mobile layout breaking */
+  }
+  
+  .logout-btn span {
+    display: none !important; /* Only show icon on mobile */
+  }
+  
+  .logout-btn {
+    padding: 0.5rem;
+  }
+  
+  .feed-controls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0;
   }
 }
 
@@ -1850,14 +1904,14 @@ blockquote {
 
 /* AI-Free Mind Tagline Styling */
 .mind-note {
-  font-size: 0.76rem;
+  font-size: 0.82rem;
   color: var(--accent);
   opacity: 0.85;
   font-family: var(--font-sans);
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  margin-top: 0.25rem;
-  font-weight: 600;
+  margin-top: 0.45rem;
+  font-weight: 500;
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -1877,4 +1931,47 @@ blockquote {
 @keyframes pulse {
   0% { transform: scale(0.8); opacity: 0.5; }
   100% { transform: scale(1.2); opacity: 1; }
+}
+
+/* Feed controls (Post Count + Sort Dropdown alignment) */
+.feed-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  padding: 0 0.5rem;
+}
+
+.feed-controls .post-count-label {
+  margin-bottom: 0;
+}
+
+.sort-widget {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.sort-widget select {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--card-border);
+  color: var(--text-primary);
+  border-radius: 8px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.85rem;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  outline: none;
+  transition: var(--transition-fast);
+}
+
+.light-mode .sort-widget select {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.sort-widget select:focus {
+  border-color: var(--accent);
 }

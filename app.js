@@ -54,7 +54,7 @@ async function writeAccessLog(action, status) {
   const currentUser = localStorage.getItem('visitor_name') || 'Guest';
   const activityStr = action + (status ? ' (' + status + ')' : '');
   const sessionId = getSessionId();
-  
+
   if (backend === 'standalone') {
     try {
       const localLogs = JSON.parse(localStorage.getItem('local_access_logs') || '[]');
@@ -140,7 +140,7 @@ function trackVisitorLanding() {
   if (isNew) {
     localStorage.setItem('has_visited_before', 'true');
   }
-  
+
   const landingLogged = sessionStorage.getItem('landing_logged');
   if (!landingLogged) {
     sessionStorage.setItem('landing_logged', 'true');
@@ -227,14 +227,14 @@ function switchView(viewId) {
   if (feedView) feedView.classList.add('hidden');
   if (feedbackView) feedbackView.classList.add('hidden');
   if (adminView) adminView.classList.add('hidden');
-  
+
   const targetView = document.getElementById(viewId);
   if (targetView) targetView.classList.remove('hidden');
-  
+
   if (navFeedBtn) navFeedBtn.classList.remove('active');
   if (navFeedbackBtn) navFeedbackBtn.classList.remove('active');
   if (navAdminBtn) navAdminBtn.classList.remove('active');
-  
+
   if (viewId === 'feedView' && navFeedBtn) navFeedBtn.classList.add('active');
   if (viewId === 'feedbackView' && navFeedbackBtn) navFeedbackBtn.classList.add('active');
   if (viewId === 'adminView' && navAdminBtn) navAdminBtn.classList.add('active');
@@ -255,10 +255,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Apply Config
   applyConfig();
-  
+
   // Set current year in footer
   currentYearSpan.textContent = new Date().getFullYear();
-  
+
   // Set theme from localStorage or fallback to dark
   const savedTheme = localStorage.getItem('theme');
   if (savedTheme) {
@@ -275,7 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Check saved session
   checkSavedSession();
-  
+
   // Left Sidebar Navigation Button Listeners
   if (navFeedBtn) navFeedBtn.addEventListener('click', () => switchView('feedView'));
   if (navFeedbackBtn) navFeedbackBtn.addEventListener('click', () => {
@@ -291,15 +291,15 @@ document.addEventListener('DOMContentLoaded', () => {
   loginForm.addEventListener('submit', handleLogin);
   logoutBtn.addEventListener('click', handleLogout);
   themeToggle.addEventListener('click', toggleTheme);
-  
+
   searchInput.addEventListener('input', handleSearch);
-  
+
   // Modal Close Events
   modalCloseBtn.addEventListener('click', closeReader);
   readingModal.addEventListener('click', (e) => {
     if (e.target === readingModal) closeReader();
   });
-  
+
   // Feedback Form submit
   const feedbackForm = document.getElementById('feedbackForm');
   if (feedbackForm) {
@@ -320,7 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   });
-  
+
   // Exit Admin Mode button event
   const exitAdminModeBtn = document.getElementById('exitAdminModeBtn');
   if (exitAdminModeBtn) {
@@ -333,10 +333,10 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('Admin mode deactivated. Admin dashboard links are now hidden.');
     });
   }
-  
+
   // Comments form event
   commentForm.addEventListener('submit', handleCommentSubmit);
-  
+
   // Admin publish form event
   const adminPublishForm = document.getElementById('adminPublishForm');
   if (adminPublishForm) {
@@ -357,10 +357,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-  
+
   // Tag pills navigation setup
   setupTagFilters();
-  
+
   // Close modal on Escape key
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
@@ -384,7 +384,7 @@ function applyConfig() {
     }
     // Hide/show admin portal buttons
     updateAdminVisibility();
-    
+
     // Check if database configs are set
     if (getBackendType() === 'standalone') {
       standaloneBanner.classList.remove('hidden');
@@ -421,20 +421,20 @@ async function checkSavedSession() {
   if (startupFetchPromise) {
     await startupFetchPromise;
   }
-  
+
   const savedPassword = localStorage.getItem('journal_password');
   if (savedPassword) {
     try {
       passwordInput.value = savedPassword;
       unlockBtn.disabled = true;
       unlockBtn.querySelector('span').textContent = 'Decrypting...';
-      
+
       // Check if saved password is admin or custom user password
       const hash = await sha256(savedPassword);
       const isSuperAdmin = (hash === BLOG_CONFIG.adminPasswordHash);
       const isCustomUser = (activeUserPasswordHash && hash === activeUserPasswordHash);
       const decryptPassword = (isSuperAdmin || isCustomUser) ? "thoughts" : savedPassword;
-      
+
       const decrypted = await fetchAndDecrypt(decryptPassword);
       if (decrypted) {
         activeDecryptionPassword = decryptPassword;
@@ -458,7 +458,7 @@ async function checkSavedSession() {
       passwordInput.value = '';
     } finally {
       unlockBtn.disabled = false;
-      unlockBtn.querySelector('span').textContent = 'Unlock Journal';
+      unlockBtn.querySelector('span').textContent = 'Seeking to Knowing';
     }
   }
 }
@@ -466,34 +466,34 @@ async function checkSavedSession() {
 // Handle Login submit
 async function handleLogin(e) {
   e.preventDefault();
-  
+
   if (startupFetchPromise) {
     await startupFetchPromise;
   }
-  
+
   const password = passwordInput.value;
   const name = visitorNameInput ? visitorNameInput.value.trim() : '';
-  
+
   if (!password || !name) return;
-  
+
   loginError.classList.remove('show');
   unlockBtn.disabled = true;
   unlockBtn.querySelector('span').textContent = 'Decrypting...';
-  
+
   try {
     // Check if the typed password matches the Super Admin hash or custom user password hash
     const hash = await sha256(password);
     const isSuperAdmin = (hash === BLOG_CONFIG.adminPasswordHash);
     const isCustomUser = (activeUserPasswordHash && hash === activeUserPasswordHash);
     const decryptPassword = (isSuperAdmin || isCustomUser) ? "thoughts" : password;
-    
+
     const decrypted = await fetchAndDecrypt(decryptPassword);
     if (decrypted) {
       activeDecryptionPassword = decryptPassword;
       decryptedPosts = decrypted;
       localStorage.setItem('journal_password', password);
       localStorage.setItem('visitor_name', name);
-      
+
       if (isSuperAdmin) {
         isAdminLogged = true;
         localStorage.setItem('admin_mode', 'true');
@@ -503,11 +503,11 @@ async function handleLogin(e) {
         localStorage.removeItem('admin_mode');
         localStorage.removeItem('admin_logged');
       }
-      
+
       updateAdminVisibility();
       mergeAndRenderFeeds();
       showApp();
-      
+
       const logType = isSuperAdmin ? 'Admin Login' : 'Visitor Login';
       writeAccessLog(logType, `Success (Name: ${name})`);
     } else {
@@ -520,7 +520,7 @@ async function handleLogin(e) {
     writeAccessLog('Visitor Login', `Blocked (System Decryption Failure, Name: ${name})`);
   } finally {
     unlockBtn.disabled = false;
-    unlockBtn.querySelector('span').textContent = 'Unlock Journal';
+    unlockBtn.querySelector('span').textContent = 'Seeking to Knowing';
   }
 }
 
@@ -542,13 +542,13 @@ function handleLogout() {
   decryptedPosts = [];
   passwordInput.value = '';
   loginError.classList.remove('show');
-  
+
   // Clear welcome greeting
   const welcomeUserEl = document.getElementById('welcomeUser');
   if (welcomeUserEl) {
     welcomeUserEl.textContent = '';
   }
-  
+
   blogApp.classList.add('hidden');
   lockScreen.classList.remove('hidden');
 }
@@ -557,7 +557,7 @@ function handleLogout() {
 async function showApp() {
   lockScreen.classList.add('hidden');
   blogApp.classList.remove('hidden');
-  
+
   // Set welcome user greeting
   const name = localStorage.getItem('visitor_name') || 'Guest';
   const isAdmin = localStorage.getItem('admin_mode') === 'true';
@@ -565,13 +565,13 @@ async function showApp() {
   if (welcomeUserEl) {
     welcomeUserEl.textContent = `Welcome, ${name}${isAdmin ? ' (Admin)' : ''}`;
   }
-  
+
   if (startupFetchPromise) {
     await startupFetchPromise;
   } else {
     await fetchBackendData();
   }
-  
+
   switchView('feedView');   // Default to Feed SPA view
   searchInput.focus();
   checkHashAndOpenPost();   // Open deep-linked inquiry if requested
@@ -597,12 +597,12 @@ async function fetchAndDecrypt(password) {
 async function decryptPayload(password, encryptedData) {
   const encoder = new TextEncoder();
   const passwordBytes = encoder.encode(password);
-  
+
   // Convert base64 fields back to ArrayBuffers
   const saltBytes = base64ToArrayBuffer(encryptedData.salt);
   const ivBytes = base64ToArrayBuffer(encryptedData.iv);
   const ciphertextBytes = base64ToArrayBuffer(encryptedData.ciphertext);
-  
+
   // 1. Import raw password key
   const rawKey = await window.crypto.subtle.importKey(
     'raw',
@@ -611,7 +611,7 @@ async function decryptPayload(password, encryptedData) {
     false,
     ['deriveKey']
   );
-  
+
   // 2. Derive decryption key using PBKDF2
   const aesKey = await window.crypto.subtle.deriveKey(
     {
@@ -625,7 +625,7 @@ async function decryptPayload(password, encryptedData) {
     false,
     ['decrypt']
   );
-  
+
   // 3. Decrypt payload
   const decryptedBuffer = await window.crypto.subtle.decrypt(
     {
@@ -636,11 +636,11 @@ async function decryptPayload(password, encryptedData) {
     aesKey,
     ciphertextBytes
   );
-  
+
   // Convert buffer to string
   const decoder = new TextDecoder('utf-8');
   const decryptedText = decoder.decode(decryptedBuffer);
-  
+
   return JSON.parse(decryptedText);
 }
 
@@ -659,11 +659,11 @@ function base64ToArrayBuffer(base64Str) {
 async function encryptPayload(password, payload) {
   const encoder = new TextEncoder();
   const passwordBytes = encoder.encode(password);
-  
+
   // Generate random salt and IV
   const saltBytes = window.crypto.getRandomValues(new Uint8Array(16));
   const ivBytes = window.crypto.getRandomValues(new Uint8Array(12));
-  
+
   // 1. Import raw password key
   const rawKey = await window.crypto.subtle.importKey(
     'raw',
@@ -672,7 +672,7 @@ async function encryptPayload(password, payload) {
     false,
     ['deriveKey']
   );
-  
+
   // 2. Derive key using PBKDF2
   const iterations = 100000;
   const aesKey = await window.crypto.subtle.deriveKey(
@@ -687,7 +687,7 @@ async function encryptPayload(password, payload) {
     false,
     ['encrypt']
   );
-  
+
   // 3. Encrypt payload
   const plaintextBytes = encoder.encode(JSON.stringify(payload));
   const ciphertextBuffer = await window.crypto.subtle.encrypt(
@@ -699,7 +699,7 @@ async function encryptPayload(password, payload) {
     aesKey,
     plaintextBytes
   );
-  
+
   return {
     salt: arrayBufferToBase64(saltBytes),
     iv: arrayBufferToBase64(ivBytes),
@@ -722,27 +722,27 @@ function arrayBufferToBase64(buffer) {
 // Formatting posts: parse custom WhatsApp markup to HTML
 function formatPostContent(text) {
   if (!text) return '';
-  
+
   // Escape HTML entities to prevent rendering arbitrary HTML tags (XSS safety)
   let safe = text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
-    
+
   // Format bold lines: *bold text* -> <strong>bold text</strong>
   safe = safe.replace(/\*([^\*]+)\*/g, '<strong>$1</strong>');
-  
+
   // Format italics lines: _italic text_ -> <em>italic text</em>
   safe = safe.replace(/_([^_]+)_/g, '<em>$1</em>');
-  
+
   // Process block by block
   const lines = safe.split('\n');
   let html = '';
   let inList = false;
-  
+
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
-    
+
     if (line === '') {
       if (inList) {
         html += '</ul>';
@@ -750,7 +750,7 @@ function formatPostContent(text) {
       }
       continue;
     }
-    
+
     // Check for inline images: &lt;attached: image.jpg&gt;
     const imgMatch = line.match(/&lt;attached:\s*([^&]+)&gt;/i);
     if (imgMatch) {
@@ -762,7 +762,7 @@ function formatPostContent(text) {
       `;
       continue;
     }
-    
+
     // Check for bullet lists (starts with bullet character, asterisks or dash)
     const listMatch = line.match(/^(?:&bull;|•|\*|-)\s+(.*)$/);
     if (listMatch) {
@@ -776,7 +776,7 @@ function formatPostContent(text) {
         html += '</ul>';
         inList = false;
       }
-      
+
       // Check for blockquotes (starts with > or &gt;)
       if (line.startsWith('&gt;') || line.startsWith('>')) {
         const quoteText = line.replace(/^(&gt;|>)\s*/, '');
@@ -786,11 +786,11 @@ function formatPostContent(text) {
       }
     }
   }
-  
+
   if (inList) {
     html += '</ul>';
   }
-  
+
   return html;
 }
 
@@ -807,7 +807,7 @@ function formatDate(dateStr) {
   try {
     const parts = dateStr.split('/');
     if (parts.length !== 3) return dateStr;
-    
+
     // Parse Day, Month, Year (handling 2-digit years or 4-digit years)
     let day = parseInt(parts[0], 10);
     let month = parseInt(parts[1], 10) - 1;
@@ -816,7 +816,7 @@ function formatDate(dateStr) {
       year = '20' + year;
     }
     year = parseInt(year, 10);
-    
+
     const date = new Date(year, month, day);
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
     return date.toLocaleDateString('en-US', options);
@@ -828,7 +828,7 @@ function formatDate(dateStr) {
 // Merge static decrypted posts and dynamic posts from backend, then render them
 function mergeAndRenderFeeds() {
   const combined = [...decryptedPosts, ...sheetDynamicPosts];
-  
+
   // Remove duplicates just in case
   const seenIds = new Set();
   const uniqueCombined = [];
@@ -838,12 +838,12 @@ function mergeAndRenderFeeds() {
       uniqueCombined.push(p);
     }
   });
-  
+
   uniqueCombined.sort((a, b) => b.id - a.id);
   activeFeedPosts = uniqueCombined;
-  
+
   renderPosts(activeFeedPosts);
-  
+
   if (statPostCount) {
     statPostCount.textContent = activeFeedPosts.length;
   }
@@ -852,7 +852,7 @@ function mergeAndRenderFeeds() {
 // Render post cards
 function renderPosts(postsToRender) {
   postsContainer.innerHTML = '';
-  
+
   if (postsToRender.length === 0) {
     postsContainer.innerHTML = `
       <div class="no-results">
@@ -869,29 +869,50 @@ function renderPosts(postsToRender) {
     }
     return;
   }
-  
-  if (postCount) {
-    postCount.textContent = `${postsToRender.length} ${postsToRender.length === 1 ? 'thought' : 'thoughts'} found`;
-  }
-  
+
+  // Clone to avoid mutating inputs
+  const sortedPosts = [...postsToRender];
+  const sortSelect = document.getElementById('postSortSelect');
+  const sortVal = sortSelect ? sortSelect.value : 'newest';
+
   // Group views by post_id
   const viewsCountMap = {};
   allViews.forEach(v => {
     viewsCountMap[v.post_id] = (viewsCountMap[v.post_id] || 0) + 1;
   });
 
-  postsToRender.forEach(post => {
+  // Group likes by post_id
+  const likesCountMap = {};
+  allLikes.forEach(l => {
+    likesCountMap[l.post_id] = (likesCountMap[l.post_id] || 0) + 1;
+  });
+
+  if (sortVal === 'newest') {
+    sortedPosts.sort((a, b) => b.id - a.id);
+  } else if (sortVal === 'oldest') {
+    sortedPosts.sort((a, b) => a.id - b.id);
+  } else if (sortVal === 'views') {
+    sortedPosts.sort((a, b) => (viewsCountMap[b.id] || 0) - (viewsCountMap[a.id] || 0));
+  } else if (sortVal === 'likes') {
+    sortedPosts.sort((a, b) => (likesCountMap[b.id] || 0) - (likesCountMap[a.id] || 0));
+  }
+
+  if (postCount) {
+    postCount.textContent = `${sortedPosts.length} ${sortedPosts.length === 1 ? 'thought' : 'thoughts'} found`;
+  }
+
+  sortedPosts.forEach(post => {
     const card = document.createElement('article');
     card.className = 'post-card';
-    
+
     const formattedDate = formatDate(post.date);
     const readTime = calculateReadTime(post.content);
     const formattedBody = formatPostContent(post.content);
     const viewsCount = viewsCountMap[post.id] || 0;
-    
+
     // Combine Date and Time
     const displayTime = post.time ? ` • ${post.time}` : '';
-    
+
     card.innerHTML = `
       <div class="post-meta">
         <span>${formattedDate}${displayTime}</span>
@@ -926,10 +947,10 @@ function renderPosts(postsToRender) {
         </div>
       </div>
     `;
-    
+
     // Setup click handlers for reading mode
     card.querySelector('.read-more-btn').addEventListener('click', () => openReader(post));
-    
+
     // Setup click handler for share button
     card.querySelector('.share-btn').addEventListener('click', (e) => {
       e.stopPropagation(); // Prevent opening reading panel
@@ -940,16 +961,16 @@ function renderPosts(postsToRender) {
         console.error('Could not copy text: ', err);
       });
     });
-    
+
     // Setup click handler for like button
     card.querySelector('.like-btn').addEventListener('click', (e) => {
       e.stopPropagation(); // Prevent opening reading panel on heart click
       toggleLike(post.id);
     });
-    
+
     postsContainer.appendChild(card);
   });
-  
+
   // Update heart icons states and counts
   updateLikesUI();
 }
@@ -957,7 +978,7 @@ function renderPosts(postsToRender) {
 // Search filtering
 function handleSearch(e) {
   const query = e.target.value.toLowerCase().trim();
-  
+
   // Clear any active tag filters
   const tagPills = document.querySelectorAll('.tag-pill');
   tagPills.forEach(p => p.classList.remove('active'));
@@ -968,14 +989,14 @@ function handleSearch(e) {
     renderPosts(activeFeedPosts);
     return;
   }
-  
+
   const filtered = activeFeedPosts.filter(post => {
     const titleMatch = post.title.toLowerCase().includes(query);
     const contentMatch = post.content.toLowerCase().includes(query);
     const dateMatch = post.date.includes(query) || formatDate(post.date).toLowerCase().includes(query);
     return titleMatch || contentMatch || dateMatch;
   });
-  
+
   renderPosts(filtered);
 }
 
@@ -987,23 +1008,23 @@ function setupTagFilters() {
       // Toggle active states
       tagPills.forEach(p => p.classList.remove('active'));
       e.target.classList.add('active');
-      
+
       const tag = e.target.getAttribute('data-tag');
-      
+
       // Clear search box
       searchInput.value = '';
-      
+
       if (tag === 'all') {
         renderPosts(activeFeedPosts);
         return;
       }
-      
+
       const filtered = activeFeedPosts.filter(post => {
         const titleMatch = post.title.toLowerCase().includes(tag.toLowerCase());
         const contentMatch = post.content.toLowerCase().includes(tag.toLowerCase());
         return titleMatch || contentMatch;
       });
-      
+
       renderPosts(filtered);
     });
   });
@@ -1013,41 +1034,41 @@ function setupTagFilters() {
 function openReader(post) {
   activePost = post;
   modalTitle.textContent = post.title;
-  
+
   // Set window location hash to deep link without triggering a loop
   if (window.location.hash !== `#post-${post.id}`) {
     history.pushState(null, null, `#post-${post.id}`);
   }
-  
+
   const scrollToTopBtn = document.getElementById('scrollToTopBtn');
   if (scrollToTopBtn) scrollToTopBtn.classList.remove('show');
-  
+
   // Calculate views count including this new view if new to session
   const viewsCountMap = {};
   allViews.forEach(v => {
     viewsCountMap[v.post_id] = (viewsCountMap[v.post_id] || 0) + 1;
   });
-  
+
   const sessionViewKey = `viewed_post_${post.id}`;
   const isNewSessionView = !sessionStorage.getItem(sessionViewKey);
   const currentViews = (viewsCountMap[post.id] || 0) + (isNewSessionView ? 1 : 0);
-  
+
   modalDate.textContent = `${formatDate(post.date)}${post.time ? ' • ' + post.time : ''}`;
   modalReadTime.textContent = `${calculateReadTime(post.content)} • 👁️ ${currentViews} ${currentViews === 1 ? 'view' : 'views'}`;
   modalContent.innerHTML = formatPostContent(post.content);
-  
+
   // Log the view to database (deduplicated internally via sessionStorage check)
   trackPostView(post.id);
-  
+
   // Load comments
   loadComments(post.id);
-  
+
   // Sync modal like button status
   updateLikesUI();
-  
+
   readingModal.classList.remove('hidden');
   document.body.style.overflow = 'hidden'; // Lock main scroll
-  
+
   // Set progress bar to 0 initially
   progressBar.style.width = '0%';
   readingModal.scrollTop = 0;
@@ -1059,15 +1080,20 @@ function closeReader(updateHashState = true) {
   document.body.style.overflow = ''; // Restore main scroll
   progressBar.style.width = '0%';
   activePost = null;
-  
+
   if (updateHashState && window.location.hash.startsWith('#post-')) {
     history.pushState("", document.title, window.location.pathname + window.location.search);
   }
-  
+
   const scrollToTopBtn = document.getElementById('scrollToTopBtn');
   if (scrollToTopBtn) scrollToTopBtn.classList.remove('show');
-  
+
   // Re-render the active feed to show the updated views count
+  refreshCurrentFeed();
+}
+
+// Refresh the current feed layout with existing tag/search filters
+function refreshCurrentFeed() {
   if (searchInput && searchInput.value.trim() !== '') {
     handleSearch({ target: searchInput });
   } else {
@@ -1109,7 +1135,7 @@ async function fetchBackendData() {
     allLikes = JSON.parse(localStorage.getItem('local_likes') || '[]');
     allViews = JSON.parse(localStorage.getItem('local_views') || '[]');
     allFeedback = JSON.parse(localStorage.getItem('local_feedback') || '[]');
-    
+
     // Handle local dynamic posts
     const localDynamic = JSON.parse(localStorage.getItem('local_dynamic_posts') || '[]');
     const decryptedDynamic = [];
@@ -1143,7 +1169,7 @@ async function fetchBackendData() {
     updateLikesUI();
     return;
   }
-  
+
   if (backend === 'sheets') {
     try {
       const response = await fetch(BLOG_CONFIG.googleSheetsUrl);
@@ -1152,7 +1178,7 @@ async function fetchBackendData() {
         allLikes = data.likes || [];
         allViews = data.views || [];
         allFeedback = data.feedback || [];
-        
+
         // Handle dynamic posts from Google Sheets
         const sheetDynamic = data.posts || [];
         const decryptedDynamic = [];
@@ -1234,13 +1260,13 @@ async function fetchBackendData() {
 // Sync counts and user states for all like buttons
 function updateLikesUI() {
   const visitorId = getVisitorId();
-  
+
   // Count likes per post_id
   const likesCount = {};
   allLikes.forEach(l => {
     likesCount[l.post_id] = (likesCount[l.post_id] || 0) + 1;
   });
-  
+
   // Determine posts liked by this visitor
   const visitorLiked = new Set();
   allLikes.forEach(l => {
@@ -1248,7 +1274,7 @@ function updateLikesUI() {
       visitorLiked.add(Number(l.post_id));
     }
   });
-  
+
   // Update cards like buttons
   const cardLikeBtns = document.querySelectorAll('.like-btn');
   cardLikeBtns.forEach(btn => {
@@ -1256,21 +1282,21 @@ function updateLikesUI() {
     const countSpan = btn.querySelector('.like-count');
     const count = likesCount[postId] || 0;
     if (countSpan) countSpan.textContent = count;
-    
+
     if (visitorLiked.has(postId)) {
       btn.classList.add('liked');
     } else {
       btn.classList.remove('liked');
     }
   });
-  
+
   // Update modal like button
   if (activePost) {
     const modalLikeBtn = document.getElementById('modalLikeBtn');
     const modalLikeCount = document.getElementById('modalLikeCount');
     const count = likesCount[activePost.id] || 0;
     if (modalLikeCount) modalLikeCount.textContent = count;
-    
+
     if (modalLikeBtn) {
       if (visitorLiked.has(activePost.id)) {
         modalLikeBtn.classList.add('liked');
@@ -1289,10 +1315,10 @@ async function toggleLike(postId) {
   const postTitle = post ? post.title : 'Unknown Post';
   const currentUser = localStorage.getItem('visitor_name') || 'Guest';
   const sessionId = getSessionId();
-  
+
   const existingIndex = allLikes.findIndex(l => Number(l.post_id) === Number(postId) && l.visitor_id === visitorId);
   const isLiked = existingIndex !== -1;
-  
+
   if (backend === 'standalone') {
     // Local storage only
     if (isLiked) {
@@ -1406,16 +1432,16 @@ async function toggleLike(postId) {
 async function loadComments(postId) {
   commentsList.innerHTML = '<p class="loading-state">Loading comments...</p>';
   commentCount.textContent = '0';
-  
+
   const backend = getBackendType();
-  
+
   if (backend === 'standalone') {
     const allComments = JSON.parse(localStorage.getItem('local_comments') || '[]');
     const postComments = allComments.filter(c => Number(c.post_id) === Number(postId));
     renderComments(postComments);
     return;
   }
-  
+
   if (backend === 'sheets') {
     try {
       const response = await fetch(BLOG_CONFIG.googleSheetsUrl);
@@ -1463,24 +1489,24 @@ async function loadComments(postId) {
 function renderComments(comments) {
   commentsList.innerHTML = '';
   commentCount.textContent = comments.length;
-  
+
   if (comments.length === 0) {
     commentsList.innerHTML = '<p class="no-comments">No reflections posted yet. Be the first to share your understanding.</p>';
     return;
   }
-  
+
   comments.forEach(comment => {
     const card = document.createElement('div');
     card.className = 'comment-card';
-    
+
     let timeStr = '';
     try {
       const dateObj = new Date(comment.created_at || comment.timestamp);
       timeStr = dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    } catch(e) {
+    } catch (e) {
       timeStr = comment.created_at || 'Just now';
     }
-    
+
     const initial = comment.author ? comment.author.trim().charAt(0).toUpperCase() : '?';
     card.innerHTML = `
       <div class="comment-avatar">${escapeHtml(initial)}</div>
@@ -1500,15 +1526,15 @@ function renderComments(comments) {
 async function handleCommentSubmit(e) {
   e.preventDefault();
   if (!activePost) return;
-  
+
   const author = commentAuthor.value.trim();
   const text = commentText.value.trim();
   const sessionId = getSessionId();
-  
+
   if (!author || !text) return;
-  
+
   const backend = getBackendType();
-  
+
   if (backend === 'standalone') {
     const allComments = JSON.parse(localStorage.getItem('local_comments') || '[]');
     const newComment = {
@@ -1522,12 +1548,12 @@ async function handleCommentSubmit(e) {
     };
     allComments.push(newComment);
     localStorage.setItem('local_comments', JSON.stringify(allComments));
-    
+
     commentText.value = '';
     loadComments(activePost.id);
     return;
   }
-  
+
   if (backend === 'sheets') {
     try {
       await fetch(BLOG_CONFIG.googleSheetsUrl, {
@@ -1598,20 +1624,20 @@ function renderPostViewsTable() {
   const tableBody = document.getElementById('adminPostViewsTableBody');
   if (!tableBody) return;
   tableBody.innerHTML = '';
-  
+
   if (decryptedPosts.length === 0) {
     tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No posts found.</td></tr>';
     return;
   }
-  
+
   // Group views by post_id (Total Views and Unique Viewers Sets)
   const totalViewsMap = {};
   const uniqueViewersMap = {};
-  
+
   allViews.forEach(v => {
     const pid = Number(v.post_id);
     totalViewsMap[pid] = (totalViewsMap[pid] || 0) + 1;
-    
+
     if (!uniqueViewersMap[pid]) {
       uniqueViewersMap[pid] = new Set();
     }
@@ -1619,14 +1645,14 @@ function renderPostViewsTable() {
       uniqueViewersMap[pid].add(v.visitor_id);
     }
   });
-  
+
   decryptedPosts.forEach(post => {
     const row = document.createElement('tr');
     const pid = Number(post.id);
     const viewsCount = totalViewsMap[pid] || 0;
     const uniqueCount = uniqueViewersMap[pid] ? uniqueViewersMap[pid].size : 0;
     const formattedDate = formatDate(post.date);
-    
+
     row.innerHTML = `
       <td>Post #${post.id}</td>
       <td><strong>${escapeHtml(post.title)}</strong></td>
@@ -1645,22 +1671,22 @@ async function loadAdminAnalytics() {
   if (adminPostViewsTableBody) {
     adminPostViewsTableBody.innerHTML = '<tr><td colspan="4" class="text-center">Fetching views...</td></tr>';
   }
-  
+
   const backend = getBackendType();
-  
+
   if (backend === 'standalone') {
     const localLogs = JSON.parse(localStorage.getItem('local_access_logs') || '[]');
     const localComments = JSON.parse(localStorage.getItem('local_comments') || '[]');
     allLikes = JSON.parse(localStorage.getItem('local_likes') || '[]');
     allViews = JSON.parse(localStorage.getItem('local_views') || '[]');
-    
+
     renderAdminLogs(localLogs);
     renderAdminComments(localComments);
     renderPostViewsTable();
     calculateStats(localLogs, localComments);
     return;
   }
-  
+
   if (backend === 'sheets') {
     try {
       const response = await fetch(BLOG_CONFIG.googleSheetsUrl);
@@ -1670,7 +1696,7 @@ async function loadAdminAnalytics() {
         const comments = data.comments || [];
         allLikes = data.likes || [];
         allViews = data.views || [];
-        
+
         renderAdminLogs(logs);
         renderAdminComments(comments);
         renderPostViewsTable();
@@ -1689,7 +1715,7 @@ async function loadAdminAnalytics() {
     const localComments = JSON.parse(localStorage.getItem('local_comments') || '[]');
     allLikes = JSON.parse(localStorage.getItem('local_likes') || '[]');
     allViews = JSON.parse(localStorage.getItem('local_views') || '[]');
-    
+
     renderAdminLogs(localLogs);
     renderAdminComments(localComments);
     renderPostViewsTable();
@@ -1702,7 +1728,7 @@ async function loadAdminAnalytics() {
       method: 'GET',
       headers
     });
-    
+
     const commentsRes = await fetch(`${BLOG_CONFIG.supabaseUrl}/rest/v1/comments?order=created_at.desc`, {
       method: 'GET',
       headers
@@ -1720,7 +1746,7 @@ async function loadAdminAnalytics() {
         allLikes = await likesRes.json();
       }
       allViews = JSON.parse(localStorage.getItem('local_views') || '[]');
-      
+
       renderAdminLogs(logs);
       renderAdminComments(comments);
       renderPostViewsTable();
@@ -1735,28 +1761,28 @@ async function loadAdminAnalytics() {
 function calculateStats(logs, comments) {
   statTotalLogs.textContent = logs.length;
   statTotalComments.textContent = comments.length;
-  
+
   const statTotalLikes = document.getElementById('statTotalLikes');
   if (statTotalLikes) {
     statTotalLikes.textContent = allLikes.length;
   }
-  
+
   // Count success and blocked logins
   const success = logs.filter(l => {
     const act = (l.activity || '').toLowerCase();
     const stat = (l.status || '').toLowerCase();
     return act.includes('success') || stat.includes('success');
   }).length;
-  
+
   const blocked = logs.filter(l => {
     const act = (l.activity || '').toLowerCase();
     const stat = (l.status || '').toLowerCase();
     return act.includes('blocked') || stat.includes('blocked');
   }).length;
-  
+
   statSuccessLogins.textContent = success;
   statBlockedLogins.textContent = blocked;
-  
+
   // Update new stats cards (Total Views and Unique Visitors)
   const statTotalViews = document.getElementById('statTotalViews');
   if (statTotalViews) {
@@ -1781,29 +1807,29 @@ function calculateStats(logs, comments) {
 // Render access logs table
 function renderAdminLogs(logs) {
   adminLogsTableBody.innerHTML = '';
-  
+
   if (logs.length === 0) {
     adminLogsTableBody.innerHTML = '<tr><td colspan="5" class="text-center">No logs recorded yet.</td></tr>';
     return;
   }
-  
+
   logs.forEach(log => {
     const row = document.createElement('tr');
-    
+
     let timeStr = '';
     try {
       const d = new Date(log.timestamp);
       timeStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    } catch(e) {
+    } catch (e) {
       timeStr = log.timestamp;
     }
-    
+
     // Fallbacks for older logs
     const logUser = log.user || 'Guest';
     const logActivity = log.activity || log.action || 'Unknown Action';
     const logSession = log.session_id || 'N/A';
     const logBrowser = log.browser_traceback || log.user_agent || 'Unknown';
-    
+
     row.innerHTML = `
       <td>${timeStr}</td>
       <td><span class="user-badge">${escapeHtml(logUser)}</span></td>
@@ -1824,15 +1850,15 @@ function truncateString(str, num) {
 // Render comments in admin moderation table
 function renderAdminComments(comments) {
   adminCommentsTableBody.innerHTML = '';
-  
+
   if (comments.length === 0) {
     adminCommentsTableBody.innerHTML = '<tr><td colspan="4" class="text-center">No comments exist.</td></tr>';
     return;
   }
-  
+
   comments.forEach(comment => {
     const row = document.createElement('tr');
-    
+
     row.innerHTML = `
       <td>Post #${comment.post_id}</td>
       <td><strong>${escapeHtml(comment.author)}</strong></td>
@@ -1841,7 +1867,7 @@ function renderAdminComments(comments) {
         <button class="delete-btn" data-id="${comment.id}">Delete</button>
       </td>
     `;
-    
+
     row.querySelector('.delete-btn').addEventListener('click', () => deleteComment(comment.id));
     adminCommentsTableBody.appendChild(row);
   });
@@ -1850,9 +1876,9 @@ function renderAdminComments(comments) {
 // Delete comment from database (Admin command)
 async function deleteComment(commentId) {
   if (!confirm('Are you sure you want to permanently delete this comment?')) return;
-  
+
   const backend = getBackendType();
-  
+
   if (backend === 'standalone') {
     const allComments = JSON.parse(localStorage.getItem('local_comments') || '[]');
     const filtered = allComments.filter(c => Number(c.id) !== Number(commentId));
@@ -1860,7 +1886,7 @@ async function deleteComment(commentId) {
     loadAdminAnalytics();
     return;
   }
-  
+
   if (backend === 'sheets') {
     try {
       await fetch(BLOG_CONFIG.googleSheetsUrl, {
@@ -1910,22 +1936,22 @@ async function deleteComment(commentId) {
 async function handleAdminPasswordSubmit(e) {
   e.preventDefault();
   if (!newRegularPasswordInput) return;
-  
+
   const newPassword = newRegularPasswordInput.value.trim();
   if (!newPassword) return;
-  
+
   if (!confirm('Are you sure you want to change the password for regular users?')) return;
-  
+
   const submitBtn = e.target.querySelector('button[type="submit"]');
   if (submitBtn) {
     submitBtn.disabled = true;
     submitBtn.textContent = 'Updating...';
   }
-  
+
   try {
     const hash = await sha256(newPassword);
     const backend = getBackendType();
-    
+
     if (backend === 'standalone') {
       const localDynamic = JSON.parse(localStorage.getItem('local_dynamic_posts') || '[]');
       localDynamic.push({
@@ -1980,7 +2006,7 @@ async function trackPostView(postId) {
   const postTitle = post ? post.title : 'Unknown Post';
   const currentUser = localStorage.getItem('visitor_name') || 'Guest';
   const sessionId = getSessionId();
-  
+
   // Track locally
   allViews.push({
     post_id: Number(postId),
@@ -1990,12 +2016,12 @@ async function trackPostView(postId) {
     created_at: new Date().toISOString(),
     session_id: sessionId
   });
-  
+
   if (backend === 'standalone') {
     localStorage.setItem('local_views', JSON.stringify(allViews));
     return;
   }
-  
+
   if (backend === 'sheets') {
     try {
       await fetch(BLOG_CONFIG.googleSheetsUrl, {
@@ -2023,27 +2049,27 @@ function renderFeedbackList() {
   const feedbackList = document.getElementById('feedbackList');
   if (!feedbackList) return;
   feedbackList.innerHTML = '';
-  
+
   if (allFeedback.length === 0) {
     feedbackList.innerHTML = '<p class="no-comments">No feedback posted yet. Be the first to share your feedback.</p>';
     return;
   }
-  
+
   // Newest feedback first
   const sortedFeedback = [...allFeedback].reverse();
-  
+
   sortedFeedback.forEach(fb => {
     const card = document.createElement('div');
     card.className = 'comment-card'; // Reuse comment card styling
-    
+
     let timeStr = '';
     try {
       const dateObj = new Date(fb.created_at || fb.timestamp);
       timeStr = dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    } catch(e) {
+    } catch (e) {
       timeStr = fb.created_at || 'Just now';
     }
-    
+
     // Generate stars HTML
     let starsHtml = '';
     const rating = Number(fb.rating) || 5;
@@ -2054,9 +2080,9 @@ function renderFeedbackList() {
         starsHtml += '<span style="color: var(--text-muted); font-size: 1rem; margin-right: 2px;">&#9734;</span>';
       }
     }
-    
+
     const initial = fb.author ? fb.author.trim().charAt(0).toUpperCase() : '?';
-    
+
     card.innerHTML = `
       <div class="comment-avatar">${escapeHtml(initial)}</div>
       <div class="comment-content">
@@ -2068,7 +2094,7 @@ function renderFeedbackList() {
         <div class="comment-text">${escapeHtml(fb.text)}</div>
       </div>
     `;
-    
+
     // Show Delete button for admin moderation inline
     if (isAdminLogged) {
       const header = card.querySelector('.comment-header');
@@ -2081,7 +2107,7 @@ function renderFeedbackList() {
       deleteBtn.addEventListener('click', () => deleteFeedback(fb.id));
       header.appendChild(deleteBtn);
     }
-    
+
     feedbackList.appendChild(card);
   });
 }
@@ -2092,14 +2118,14 @@ async function handleFeedbackSubmit(e) {
   const authorEl = document.getElementById('feedbackAuthor');
   const textEl = document.getElementById('feedbackText');
   if (!authorEl || !textEl) return;
-  
+
   const author = authorEl.value.trim();
   const text = textEl.value.trim();
   const rating = selectedRating;
   const sessionId = getSessionId();
-  
+
   if (!author || !text) return;
-  
+
   const backend = getBackendType();
   const newFeedback = {
     id: Date.now(),
@@ -2109,23 +2135,23 @@ async function handleFeedbackSubmit(e) {
     created_at: new Date().toISOString(),
     session_id: sessionId
   };
-  
+
   allFeedback.push(newFeedback);
-  
+
   // Clear input fields
   textEl.value = '';
   // Reset rating stars to 5
   selectedRating = 5;
   const stars = document.querySelectorAll('#feedbackStars .star');
   stars.forEach(s => s.classList.remove('selected'));
-  
+
   if (backend === 'standalone') {
     localStorage.setItem('local_feedback', JSON.stringify(allFeedback));
     renderFeedbackList();
     alert('Feedback submitted locally!');
     return;
   }
-  
+
   if (backend === 'sheets') {
     try {
       await fetch(BLOG_CONFIG.googleSheetsUrl, {
@@ -2153,16 +2179,16 @@ async function handleFeedbackSubmit(e) {
 // Delete feedback (Admin command)
 async function deleteFeedback(feedbackId) {
   if (!confirm('Are you sure you want to permanently delete this feedback?')) return;
-  
+
   const backend = getBackendType();
   allFeedback = allFeedback.filter(fb => Number(fb.id) !== Number(feedbackId));
-  
+
   if (backend === 'standalone') {
     localStorage.setItem('local_feedback', JSON.stringify(allFeedback));
     renderFeedbackList();
     return;
   }
-  
+
   if (backend === 'sheets') {
     try {
       await fetch(BLOG_CONFIG.googleSheetsUrl, {
@@ -2189,41 +2215,41 @@ async function handleAdminPublishSubmit(e) {
   const titleEl = document.getElementById('postTitleInput');
   const contentEl = document.getElementById('postContentInput');
   if (!titleEl || !contentEl) return;
-  
+
   const title = titleEl.value.trim();
   const content = contentEl.value.trim();
   if (!title || !content) return;
-  
+
   const publishBtn = e.target.querySelector('button[type="submit"]');
   if (publishBtn) {
     publishBtn.disabled = true;
     publishBtn.textContent = 'Publishing...';
   }
-  
+
   try {
     const password = activeDecryptionPassword || "thoughts";
-    
+
     // Get current date and time formatted
     const now = new Date();
     const dateStr = now.toLocaleDateString('en-GB'); // DD/MM/YYYY
     const dateParts = dateStr.split('/');
     const shortDate = `${dateParts[0]}/${dateParts[1]}/${dateParts[2].slice(-2)}`; // DD/MM/YY
-    
+
     const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
-    
+
     const postPayload = {
       title: title,
       date: shortDate,
       time: timeStr,
       content: content
     };
-    
+
     // Encrypt post payload
     const encrypted = await encryptPayload(password, postPayload);
     const encryptedStr = JSON.stringify(encrypted);
-    
+
     const backend = getBackendType();
-    
+
     if (backend === 'standalone') {
       const localDynamic = JSON.parse(localStorage.getItem('local_dynamic_posts') || '[]');
       localDynamic.push({
@@ -2287,7 +2313,7 @@ function showToast(message) {
   // Trigger reflow
   toast.offsetHeight;
   toast.classList.add('show');
-  
+
   setTimeout(() => {
     toast.classList.remove('show');
   }, 3000);
@@ -2405,6 +2431,14 @@ function setupAdditionalFeatures() {
       }
     }
   });
+
+  // Sort dropdown change event listener
+  const postSortSelect = document.getElementById('postSortSelect');
+  if (postSortSelect) {
+    postSortSelect.addEventListener('change', () => {
+      refreshCurrentFeed();
+    });
+  }
 }
 
 // Invoke setup for additional elements on load

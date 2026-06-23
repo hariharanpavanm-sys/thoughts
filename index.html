@@ -34,14 +34,14 @@
         <p class="lock-subtitle">A Private Philosophical Journal</p>
         
         <div class="lock-intro-text">
-          <p>The seeking of the <strong>"Who Am I"</strong> question is something every thinking person faces once in a lifetime.</p>
-          <p class="intro-focus">Vedanta as the language reflects the understanding on solving the purpose of the human life.</p>
+          <p>Sooner or later, every sincere seeker is confronted with the question, <strong>"Who am I?"</strong></p>
+          <p class="intro-focus">Vedanta serves as a means of knowledge that unfolds.</p>
         </div>
       </div>
       
       <div class="lock-form-container">
-        <h2 class="lock-form-title">Unlock Journal</h2>
-        <p class="lock-form-desc">Provide your name and password to access the private reflections.</p>
+        <h2 class="lock-form-title">Begin the Inquiry</h2>
+        <p class="lock-form-desc">Provide your name and password to access the reflections.</p>
         
         <form id="loginForm" class="login-form">
           <div class="input-group">
@@ -51,7 +51,7 @@
             <input type="password" id="passwordInput" placeholder="Enter password to unlock..." autocomplete="current-password" required>
           </div>
           <button type="submit" id="unlockBtn" class="unlock-btn">
-            <span>Unlock Journal</span>
+            <span>Begin Inquiry</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="5" y1="12" x2="19" y2="12"></line>
               <polyline points="12 5 19 12 12 19"></polyline>
@@ -198,8 +198,19 @@
               </div>
             </div>
 
-            <!-- Feed Post List -->
-            <div id="postCount" class="post-count-label"></div>
+            <!-- Feed Post List controls -->
+            <div class="feed-controls">
+              <div id="postCount" class="post-count-label"></div>
+              <div class="sort-widget">
+                <label for="postSortSelect">Sort:</label>
+                <select id="postSortSelect" aria-label="Sort inquiries">
+                  <option value="newest">Newest First</option>
+                  <option value="oldest">Oldest First</option>
+                  <option value="views">Most Viewed</option>
+                  <option value="likes">Most Liked</option>
+                </select>
+              </div>
+            </div>
             <div id="postsContainer" class="posts-container">
               <div class="loading-state">
                 <div class="spinner"></div>
@@ -423,7 +434,7 @@
     <footer class="blog-footer">
       <div class="footer-content">
         <p>&copy; <span id="currentYear"></span> <span id="footerAuthor">Hari</span>. All rights reserved.</p>
-        <p class="tagline">The self is free, unaffected and untouched. Reflecting the oneness.</p>
+        <p class="tagline">Knowing is Being</p>
       </div>
     </footer>
   </div>

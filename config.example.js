@@ -1,6 +1,6 @@
 const BLOG_CONFIG = {
   title: "The Seeker",
-  description: "A private journal of philosophical inquiries, Vedantic camp notes, and reflections on self-consciousness, Ishvara, and life.",
+  description: "A private journal seeking the purpose of human life",
   author: "Hari",
   defaultPasswordPlaceholder: "Enter password to unlock",
 
