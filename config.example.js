@@ -1,5 +1,5 @@
 const BLOG_CONFIG = {
-  title: "Thoughts & Values",
+  title: "The Seeker",
   description: "A private journal of philosophical inquiries, Vedantic camp notes, and reflections on self-consciousness, Ishvara, and life.",
   author: "Hari",
   defaultPasswordPlaceholder: "Enter password to unlock",
