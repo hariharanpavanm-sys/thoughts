@@ -148,7 +148,7 @@ a:hover {
 
 /* Standalone Alert Banner */
 .banner-section {
-  max-width: 1100px;
+  max-width: 1450px;
   margin: 0 auto;
   padding: 1.5rem 1.5rem 0;
 }
@@ -338,7 +338,7 @@ a:hover {
 }
 
 .header-content {
-  max-width: 1100px;
+  max-width: 1450px;
   margin: 0 auto;
   padding: 1.25rem 1.5rem;
   display: flex;
@@ -411,7 +411,7 @@ a:hover {
    ========================================================================== */
 .blog-layout-container {
   flex-grow: 1;
-  max-width: 1100px;
+  max-width: 1450px;
   width: 100%;
   margin: 0 auto;
   padding: 2.5rem 1.5rem 4.5rem;
@@ -426,7 +426,7 @@ a:hover {
 @media (min-width: 900px) {
   .blog-layout {
     display: grid;
-    grid-template-columns: 200px 1fr 280px;
+    grid-template-columns: 240px 1fr 340px;
     gap: 3rem;
     align-items: start;
   }
@@ -1135,13 +1135,37 @@ blockquote {
 .analytics-card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  padding: 1.5rem;
-  border-radius: 18px;
+  padding: 1.5rem 1.75rem;
+  border-radius: 20px;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   box-shadow: var(--shadow-sm);
+  transition: var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
 }
+.analytics-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(var(--accent-rgb), 0.25);
+  box-shadow: var(--shadow-md);
+}
+.analytics-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  opacity: 0.75;
+}
+.analytics-card:nth-child(1)::before { background-color: var(--text-muted); }
+.analytics-card:nth-child(2)::before { background-color: var(--success-color); }
+.analytics-card:nth-child(3)::before { background-color: var(--error-color); }
+.analytics-card:nth-child(4)::before { background-color: #60a5fa; }
+.analytics-card:nth-child(5)::before { background-color: #fbbf24; }
+.analytics-card:nth-child(6)::before { background-color: #ec4899; }
+.analytics-card:nth-child(7)::before { background-color: #8b5cf6; }
 
 .analytics-card .card-label {
   font-size: 0.8rem;
@@ -1215,6 +1239,17 @@ blockquote {
 
 .dashboard-table tbody tr:last-child td {
   border-bottom: none;
+}
+
+.user-badge {
+  background-color: rgba(var(--accent-rgb), 0.08);
+  color: var(--accent);
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid rgba(var(--accent-rgb), 0.15);
+  display: inline-block;
 }
 
 .delete-btn {

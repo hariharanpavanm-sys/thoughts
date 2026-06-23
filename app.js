@@ -46,15 +46,19 @@ function getBackendType() {
 async function writeAccessLog(action, status) {
   const backend = getBackendType();
   const userAgent = navigator.userAgent;
+  const currentUser = localStorage.getItem('visitor_name') || 'Guest';
+  const activityStr = action + (status ? ' (' + status + ')' : '');
+  const sessionId = getSessionId();
   
   if (backend === 'standalone') {
     try {
       const localLogs = JSON.parse(localStorage.getItem('local_access_logs') || '[]');
       localLogs.unshift({
         timestamp: new Date().toISOString(),
-        action,
-        status,
-        user_agent: userAgent
+        user: currentUser,
+        activity: activityStr,
+        session_id: sessionId,
+        browser_traceback: userAgent
       });
       localStorage.setItem('local_access_logs', JSON.stringify(localLogs.slice(0, 100)));
     } catch (e) {
@@ -71,9 +75,10 @@ async function writeAccessLog(action, status) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'access_logs',
-          action,
-          status,
-          user_agent: userAgent
+          user: currentUser,
+          activity: activityStr,
+          session_id: sessionId,
+          browser_traceback: userAgent
         })
       });
     } catch (err) {
@@ -90,8 +95,8 @@ async function writeAccessLog(action, status) {
         method: 'POST',
         headers,
         body: JSON.stringify({
-          action,
-          status,
+          action: activityStr,
+          status: status || 'Success',
           user_agent: userAgent
         })
       });
@@ -110,6 +115,17 @@ function getVisitorId() {
   }
   return visitorId;
 }
+
+// Session Tracking ID (resets when tab is closed)
+function getSessionId() {
+  let sessionId = sessionStorage.getItem('journal_session_id');
+  if (!sessionId) {
+    sessionId = 'sess_' + Math.random().toString(36).substring(2, 10);
+    sessionStorage.setItem('journal_session_id', sessionId);
+  }
+  return sessionId;
+}
+
 
 // Track landing (once per browser tab session)
 function trackVisitorLanding() {
@@ -1040,6 +1056,10 @@ function updateLikesUI() {
 async function toggleLike(postId) {
   const visitorId = getVisitorId();
   const backend = getBackendType();
+  const post = decryptedPosts.find(p => Number(p.id) === Number(postId));
+  const postTitle = post ? post.title : 'Unknown Post';
+  const currentUser = localStorage.getItem('visitor_name') || 'Guest';
+  const sessionId = getSessionId();
   
   const existingIndex = allLikes.findIndex(l => Number(l.post_id) === Number(postId) && l.visitor_id === visitorId);
   const isLiked = existingIndex !== -1;
@@ -1051,8 +1071,11 @@ async function toggleLike(postId) {
     } else {
       allLikes.push({
         post_id: Number(postId),
+        post_title: postTitle,
+        user: currentUser,
         visitor_id: visitorId,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        session_id: sessionId
       });
     }
     localStorage.setItem('local_likes', JSON.stringify(allLikes));
@@ -1083,13 +1106,19 @@ async function toggleLike(postId) {
           body: JSON.stringify({
             type: 'likes',
             post_id: Number(postId),
-            visitor_id: visitorId
+            post_title: postTitle,
+            user: currentUser,
+            visitor_id: visitorId,
+            session_id: sessionId
           })
         });
         allLikes.push({
           post_id: Number(postId),
+          post_title: postTitle,
+          user: currentUser,
           visitor_id: visitorId,
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
+          session_id: sessionId
         });
         writeAccessLog('Visitor Liked Post', `Success (Post ID: ${postId})`);
       }
@@ -1245,6 +1274,7 @@ async function handleCommentSubmit(e) {
   
   const author = commentAuthor.value.trim();
   const text = commentText.value.trim();
+  const sessionId = getSessionId();
   
   if (!author || !text) return;
   
@@ -1255,9 +1285,11 @@ async function handleCommentSubmit(e) {
     const newComment = {
       id: Date.now(),
       post_id: activePost.id,
+      post_title: activePost.title,
       author,
       text,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
+      session_id: sessionId
     };
     allComments.push(newComment);
     localStorage.setItem('local_comments', JSON.stringify(allComments));
@@ -1276,8 +1308,10 @@ async function handleCommentSubmit(e) {
         body: JSON.stringify({
           type: 'comments',
           post_id: activePost.id,
+          post_title: activePost.title,
           author,
-          text
+          text,
+          session_id: sessionId
         })
       });
       commentText.value = '';
@@ -1337,19 +1371,31 @@ function renderPostViewsTable() {
   tableBody.innerHTML = '';
   
   if (decryptedPosts.length === 0) {
-    tableBody.innerHTML = '<tr><td colspan="4" class="text-center">No posts found.</td></tr>';
+    tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No posts found.</td></tr>';
     return;
   }
   
-  // Group views by post_id
-  const viewsCountMap = {};
+  // Group views by post_id (Total Views and Unique Viewers Sets)
+  const totalViewsMap = {};
+  const uniqueViewersMap = {};
+  
   allViews.forEach(v => {
-    viewsCountMap[v.post_id] = (viewsCountMap[v.post_id] || 0) + 1;
+    const pid = Number(v.post_id);
+    totalViewsMap[pid] = (totalViewsMap[pid] || 0) + 1;
+    
+    if (!uniqueViewersMap[pid]) {
+      uniqueViewersMap[pid] = new Set();
+    }
+    if (v.visitor_id) {
+      uniqueViewersMap[pid].add(v.visitor_id);
+    }
   });
   
   decryptedPosts.forEach(post => {
     const row = document.createElement('tr');
-    const viewsCount = viewsCountMap[post.id] || 0;
+    const pid = Number(post.id);
+    const viewsCount = totalViewsMap[pid] || 0;
+    const uniqueCount = uniqueViewersMap[pid] ? uniqueViewersMap[pid].size : 0;
     const formattedDate = formatDate(post.date);
     
     row.innerHTML = `
@@ -1357,6 +1403,7 @@ function renderPostViewsTable() {
       <td><strong>${escapeHtml(post.title)}</strong></td>
       <td>${formattedDate}</td>
       <td><span class="text-success" style="font-weight: 600;">👁️ ${viewsCount}</span></td>
+      <td><span class="text-warning" style="font-weight: 600;">👥 ${uniqueCount}</span></td>
     `;
     tableBody.appendChild(row);
   });
@@ -1465,11 +1512,41 @@ function calculateStats(logs, comments) {
     statTotalLikes.textContent = allLikes.length;
   }
   
-  const success = logs.filter(l => l.status === 'Success').length;
-  const blocked = logs.filter(l => l.status.startsWith('Blocked')).length;
+  // Count success and blocked logins
+  const success = logs.filter(l => {
+    const act = (l.activity || '').toLowerCase();
+    const stat = (l.status || '').toLowerCase();
+    return act.includes('success') || stat.includes('success');
+  }).length;
+  
+  const blocked = logs.filter(l => {
+    const act = (l.activity || '').toLowerCase();
+    const stat = (l.status || '').toLowerCase();
+    return act.includes('blocked') || stat.includes('blocked');
+  }).length;
   
   statSuccessLogins.textContent = success;
   statBlockedLogins.textContent = blocked;
+  
+  // Update new stats cards (Total Views and Unique Visitors)
+  const statTotalViews = document.getElementById('statTotalViews');
+  if (statTotalViews) {
+    statTotalViews.textContent = allViews.length;
+  }
+  const statUniqueVisitors = document.getElementById('statUniqueVisitors');
+  if (statUniqueVisitors) {
+    const uniqueVids = new Set();
+    allViews.forEach(v => { if (v.visitor_id) uniqueVids.add(v.visitor_id); });
+    allLikes.forEach(l => { if (l.visitor_id) uniqueVids.add(l.visitor_id); });
+    logs.forEach(l => {
+      const act = l.activity || '';
+      const match = act.match(/ID:\s*(visitor_[a-z0-9]+)/i);
+      if (match) {
+        uniqueVids.add(match[1]);
+      }
+    });
+    statUniqueVisitors.textContent = Math.max(1, uniqueVids.size);
+  }
 }
 
 // Render access logs table
@@ -1477,7 +1554,7 @@ function renderAdminLogs(logs) {
   adminLogsTableBody.innerHTML = '';
   
   if (logs.length === 0) {
-    adminLogsTableBody.innerHTML = '<tr><td colspan="4" class="text-center">No logs recorded yet.</td></tr>';
+    adminLogsTableBody.innerHTML = '<tr><td colspan="5" class="text-center">No logs recorded yet.</td></tr>';
     return;
   }
   
@@ -1492,14 +1569,18 @@ function renderAdminLogs(logs) {
       timeStr = log.timestamp;
     }
     
-    const isSuccess = log.status === 'Success';
-    const statusClass = isSuccess ? 'text-success' : 'text-error';
+    // Fallbacks for older logs
+    const logUser = log.user || 'Guest';
+    const logActivity = log.activity || log.action || 'Unknown Action';
+    const logSession = log.session_id || 'N/A';
+    const logBrowser = log.browser_traceback || log.user_agent || 'Unknown';
     
     row.innerHTML = `
       <td>${timeStr}</td>
-      <td><strong>${escapeHtml(log.action)}</strong></td>
-      <td class="${statusClass}">${escapeHtml(log.status)}</td>
-      <td title="${escapeHtml(log.user_agent || '')}">${escapeHtml(truncateString(log.user_agent || 'Unknown', 45))}</td>
+      <td><span class="user-badge">${escapeHtml(logUser)}</span></td>
+      <td><strong>${escapeHtml(logActivity)}</strong></td>
+      <td><code>${escapeHtml(logSession)}</code></td>
+      <td title="${escapeHtml(logBrowser)}">${escapeHtml(truncateString(logBrowser, 50))}</td>
     `;
     adminLogsTableBody.appendChild(row);
   });
@@ -1640,12 +1721,19 @@ function copyHashResult() {
 async function trackPostView(postId) {
   const backend = getBackendType();
   const visitorId = getVisitorId();
+  const post = decryptedPosts.find(p => Number(p.id) === Number(postId));
+  const postTitle = post ? post.title : 'Unknown Post';
+  const currentUser = localStorage.getItem('visitor_name') || 'Guest';
+  const sessionId = getSessionId();
   
   // Track locally
   allViews.push({
     post_id: Number(postId),
+    post_title: postTitle,
+    user: currentUser,
     visitor_id: visitorId,
-    created_at: new Date().toISOString()
+    created_at: new Date().toISOString(),
+    session_id: sessionId
   });
   
   if (backend === 'standalone') {
@@ -1662,7 +1750,10 @@ async function trackPostView(postId) {
         body: JSON.stringify({
           type: 'views',
           post_id: Number(postId),
-          visitor_id: visitorId
+          post_title: postTitle,
+          user: currentUser,
+          visitor_id: visitorId,
+          session_id: sessionId
         })
       });
     } catch (err) {
@@ -1750,6 +1841,7 @@ async function handleFeedbackSubmit(e) {
   const author = authorEl.value.trim();
   const text = textEl.value.trim();
   const rating = selectedRating;
+  const sessionId = getSessionId();
   
   if (!author || !text) return;
   
@@ -1759,7 +1851,8 @@ async function handleFeedbackSubmit(e) {
     author,
     rating,
     text,
-    created_at: new Date().toISOString()
+    created_at: new Date().toISOString(),
+    session_id: sessionId
   };
   
   allFeedback.push(newFeedback);
@@ -1788,7 +1881,8 @@ async function handleFeedbackSubmit(e) {
           type: 'feedback',
           author,
           rating,
-          text
+          text,
+          session_id: sessionId
         })
       });
       alert('Feedback submitted successfully!');

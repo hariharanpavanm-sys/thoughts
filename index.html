@@ -257,6 +257,14 @@
                   <span class="card-val text-error" id="statBlockedLogins">0</span>
                 </div>
                 <div class="analytics-card">
+                  <span class="card-label">Total Views</span>
+                  <span class="card-val text-info" id="statTotalViews" style="color: #60a5fa;">0</span>
+                </div>
+                <div class="analytics-card">
+                  <span class="card-label">Unique Visitors</span>
+                  <span class="card-val text-warning" id="statUniqueVisitors" style="color: #fbbf24;">0</span>
+                </div>
+                <div class="analytics-card">
                   <span class="card-label">Total Likes Given</span>
                   <span class="card-val" id="statTotalLikes">0</span>
                 </div>
@@ -276,11 +284,12 @@
                         <th>Post ID</th>
                         <th>Title</th>
                         <th>Date Published</th>
-                        <th>Page Views</th>
+                        <th>Total Page Views</th>
+                        <th>Unique Viewers</th>
                       </tr>
                     </thead>
                     <tbody id="adminPostViewsTableBody">
-                      <tr><td colspan="4" class="text-center">Loading views metrics...</td></tr>
+                      <tr><td colspan="5" class="text-center">Loading views metrics...</td></tr>
                     </tbody>
                   </table>
                 </div>
@@ -296,13 +305,14 @@
                       <thead>
                         <tr>
                           <th>Timestamp</th>
-                          <th>Action</th>
-                          <th>Status</th>
-                          <th>Client (User Agent)</th>
+                          <th>User</th>
+                          <th>Activity</th>
+                          <th>Session ID</th>
+                          <th>Browser Traceback</th>
                         </tr>
                       </thead>
                       <tbody id="adminLogsTableBody">
-                        <tr><td colspan="4" class="text-center">Loading logs...</td></tr>
+                        <tr><td colspan="5" class="text-center">Loading logs...</td></tr>
                       </tbody>
                     </table>
                   </div>
