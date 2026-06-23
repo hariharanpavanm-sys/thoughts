@@ -4,9 +4,13 @@
 
 // Global state
 let decryptedPosts = [];
+let activeFeedPosts = []; // Merged static + dynamic posts
 let activeTheme = 'dark';
 let activePost = null;
 let isAdminLogged = false;
+let activeDecryptionPassword = ''; // Remembers "thoughts" for admin session dynamic encrypt
+let activeUserPasswordHash = ''; // Custom regular user password hash fetched from Sheets
+let startupFetchPromise = null; // Backend data fetch promise for startup synchronization
 let allLikes = [];
 let allViews = [];
 let allFeedback = [];
@@ -157,9 +161,6 @@ const logoutBtn = document.getElementById('logoutBtn');
 const themeToggle = document.getElementById('themeToggle');
 const sunIcon = document.querySelector('.sun-icon');
 const moonIcon = document.querySelector('.moon-icon');
-const settingsToggle = document.getElementById('settingsToggle');
-const settingsDrawer = document.getElementById('settingsDrawer');
-const settingsCloseBtn = document.getElementById('settingsCloseBtn');
 const searchInput = document.getElementById('searchInput');
 const postsContainer = document.getElementById('postsContainer');
 const currentYearSpan = document.getElementById('currentYear');
@@ -206,13 +207,9 @@ const commentAuthor = document.getElementById('commentAuthor');
 const commentText = document.getElementById('commentText');
 const commentCount = document.getElementById('commentCount');
 
-// Hash Tool Elements
-const newPasswordInput = document.getElementById('newPasswordInput');
-const generateHashBtn = document.getElementById('generateHashBtn');
-const hashResultWrapper = document.getElementById('hashResultWrapper');
-const hashResultOutput = document.getElementById('hashResultOutput');
-const copyHashBtn = document.getElementById('copyHashBtn');
-const copiedMsg = document.getElementById('copiedMsg');
+// Admin Password Management Elements
+const adminPasswordForm = document.getElementById('adminPasswordForm');
+const newRegularPasswordInput = document.getElementById('newRegularPasswordInput');
 
 // Detect and update admin buttons display based on access mode
 function updateAdminVisibility() {
@@ -246,6 +243,9 @@ function switchView(viewId) {
 let selectedRating = 5;
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Start loading backend data immediately so we have the custom regular user password hash ready
+  startupFetchPromise = fetchBackendData();
+
   // Track visitor landing immediately
   trackVisitorLanding();
 
@@ -290,11 +290,6 @@ document.addEventListener('DOMContentLoaded', () => {
   loginForm.addEventListener('submit', handleLogin);
   logoutBtn.addEventListener('click', handleLogout);
   themeToggle.addEventListener('click', toggleTheme);
-  settingsToggle.addEventListener('click', () => toggleDrawer(true));
-  settingsCloseBtn.addEventListener('click', () => toggleDrawer(false));
-  settingsDrawer.addEventListener('click', (e) => {
-    if (e.target === settingsDrawer) toggleDrawer(false);
-  });
   
   searchInput.addEventListener('input', handleSearch);
   
@@ -340,6 +335,17 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Comments form event
   commentForm.addEventListener('submit', handleCommentSubmit);
+  
+  // Admin publish form event
+  const adminPublishForm = document.getElementById('adminPublishForm');
+  if (adminPublishForm) {
+    adminPublishForm.addEventListener('submit', handleAdminPublishSubmit);
+  }
+
+  // Admin password change form event
+  if (adminPasswordForm) {
+    adminPasswordForm.addEventListener('submit', handleAdminPasswordSubmit);
+  }
 
   // Modal like button event
   const modalLikeBtn = document.getElementById('modalLikeBtn');
@@ -351,18 +357,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   
-  // Hash Tool events
-  generateHashBtn.addEventListener('click', generatePasswordHash);
-  copyHashBtn.addEventListener('click', copyHashResult);
-  
   // Tag pills navigation setup
   setupTagFilters();
- 
+  
   // Close modal on Escape key
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       closeReader();
-      toggleDrawer(false);
     }
   });
 
@@ -414,23 +415,12 @@ function toggleTheme() {
   setTheme(activeTheme === 'dark' ? 'light' : 'dark');
 }
 
-// Toggle Drawer (Open/Close)
-function toggleDrawer(open) {
-  if (open) {
-    settingsDrawer.classList.remove('hidden');
-    // Force reflow
-    settingsDrawer.offsetHeight;
-    settingsDrawer.style.opacity = '1';
-  } else {
-    settingsDrawer.style.opacity = '0';
-    setTimeout(() => {
-      settingsDrawer.classList.add('hidden');
-    }, 300);
-  }
-}
-
 // Check if password exists in local storage
 async function checkSavedSession() {
+  if (startupFetchPromise) {
+    await startupFetchPromise;
+  }
+  
   const savedPassword = localStorage.getItem('journal_password');
   if (savedPassword) {
     try {
@@ -438,13 +428,15 @@ async function checkSavedSession() {
       unlockBtn.disabled = true;
       unlockBtn.querySelector('span').textContent = 'Decrypting...';
       
-      // Check if saved password is admin
+      // Check if saved password is admin or custom user password
       const hash = await sha256(savedPassword);
       const isSuperAdmin = (hash === BLOG_CONFIG.adminPasswordHash);
-      const decryptPassword = isSuperAdmin ? "thoughts" : savedPassword;
+      const isCustomUser = (activeUserPasswordHash && hash === activeUserPasswordHash);
+      const decryptPassword = (isSuperAdmin || isCustomUser) ? "thoughts" : savedPassword;
       
       const decrypted = await fetchAndDecrypt(decryptPassword);
       if (decrypted) {
+        activeDecryptionPassword = decryptPassword;
         decryptedPosts = decrypted;
         if (isSuperAdmin) {
           isAdminLogged = true;
@@ -472,6 +464,11 @@ async function checkSavedSession() {
 // Handle Login submit
 async function handleLogin(e) {
   e.preventDefault();
+  
+  if (startupFetchPromise) {
+    await startupFetchPromise;
+  }
+  
   const password = passwordInput.value;
   const name = visitorNameInput ? visitorNameInput.value.trim() : '';
   
@@ -482,13 +479,15 @@ async function handleLogin(e) {
   unlockBtn.querySelector('span').textContent = 'Decrypting...';
   
   try {
-    // Check if the typed password matches the Super Admin hash
+    // Check if the typed password matches the Super Admin hash or custom user password hash
     const hash = await sha256(password);
     const isSuperAdmin = (hash === BLOG_CONFIG.adminPasswordHash);
-    const decryptPassword = isSuperAdmin ? "thoughts" : password;
+    const isCustomUser = (activeUserPasswordHash && hash === activeUserPasswordHash);
+    const decryptPassword = (isSuperAdmin || isCustomUser) ? "thoughts" : password;
     
     const decrypted = await fetchAndDecrypt(decryptPassword);
     if (decrypted) {
+      activeDecryptionPassword = decryptPassword;
       decryptedPosts = decrypted;
       localStorage.setItem('journal_password', password);
       localStorage.setItem('visitor_name', name);
@@ -541,6 +540,12 @@ function handleLogout() {
   passwordInput.value = '';
   loginError.classList.remove('show');
   
+  // Clear welcome greeting
+  const welcomeUserEl = document.getElementById('welcomeUser');
+  if (welcomeUserEl) {
+    welcomeUserEl.textContent = '';
+  }
+  
   blogApp.classList.add('hidden');
   lockScreen.classList.remove('hidden');
 }
@@ -549,12 +554,22 @@ function handleLogout() {
 async function showApp() {
   lockScreen.classList.add('hidden');
   blogApp.classList.remove('hidden');
-  await fetchBackendData(); // Fetch likes, views, and feedback
-  switchView('feedView');   // Default to Feed SPA view
-  renderPosts(decryptedPosts);
-  if (statPostCount) {
-    statPostCount.textContent = decryptedPosts.length;
+  
+  // Set welcome user greeting
+  const name = localStorage.getItem('visitor_name') || 'Guest';
+  const isAdmin = localStorage.getItem('admin_mode') === 'true';
+  const welcomeUserEl = document.getElementById('welcomeUser');
+  if (welcomeUserEl) {
+    welcomeUserEl.textContent = `Welcome, ${name}${isAdmin ? ' (Admin)' : ''}`;
   }
+  
+  if (startupFetchPromise) {
+    await startupFetchPromise;
+  } else {
+    await fetchBackendData();
+  }
+  
+  switchView('feedView');   // Default to Feed SPA view
   searchInput.focus();
 }
 
@@ -634,6 +649,70 @@ function base64ToArrayBuffer(base64Str) {
     bytes[i] = binaryString.charCodeAt(i);
   }
   return bytes.buffer;
+}
+
+// AES-GCM Encryption (using native SubtleCrypto)
+async function encryptPayload(password, payload) {
+  const encoder = new TextEncoder();
+  const passwordBytes = encoder.encode(password);
+  
+  // Generate random salt and IV
+  const saltBytes = window.crypto.getRandomValues(new Uint8Array(16));
+  const ivBytes = window.crypto.getRandomValues(new Uint8Array(12));
+  
+  // 1. Import raw password key
+  const rawKey = await window.crypto.subtle.importKey(
+    'raw',
+    passwordBytes,
+    { name: 'PBKDF2' },
+    false,
+    ['deriveKey']
+  );
+  
+  // 2. Derive key using PBKDF2
+  const iterations = 100000;
+  const aesKey = await window.crypto.subtle.deriveKey(
+    {
+      name: 'PBKDF2',
+      salt: saltBytes,
+      iterations: iterations,
+      hash: 'SHA-256'
+    },
+    rawKey,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt']
+  );
+  
+  // 3. Encrypt payload
+  const plaintextBytes = encoder.encode(JSON.stringify(payload));
+  const ciphertextBuffer = await window.crypto.subtle.encrypt(
+    {
+      name: 'AES-GCM',
+      iv: ivBytes,
+      tagLength: 128
+    },
+    aesKey,
+    plaintextBytes
+  );
+  
+  return {
+    salt: arrayBufferToBase64(saltBytes),
+    iv: arrayBufferToBase64(ivBytes),
+    ciphertext: arrayBufferToBase64(ciphertextBuffer),
+    iterations: iterations
+  };
+}
+
+// Convert ArrayBuffer to Base64 string
+function arrayBufferToBase64(buffer) {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return window.btoa(binary);
 }
 
 // Formatting posts: parse custom WhatsApp markup to HTML
@@ -839,11 +918,11 @@ function handleSearch(e) {
   if (allTag) allTag.classList.add('active');
 
   if (query === '') {
-    renderPosts(decryptedPosts);
+    renderPosts(activeFeedPosts);
     return;
   }
   
-  const filtered = decryptedPosts.filter(post => {
+  const filtered = activeFeedPosts.filter(post => {
     const titleMatch = post.title.toLowerCase().includes(query);
     const contentMatch = post.content.toLowerCase().includes(query);
     const dateMatch = post.date.includes(query) || formatDate(post.date).toLowerCase().includes(query);
@@ -868,11 +947,11 @@ function setupTagFilters() {
       searchInput.value = '';
       
       if (tag === 'all') {
-        renderPosts(decryptedPosts);
+        renderPosts(activeFeedPosts);
         return;
       }
       
-      const filtered = decryptedPosts.filter(post => {
+      const filtered = activeFeedPosts.filter(post => {
         const titleMatch = post.title.toLowerCase().includes(tag.toLowerCase());
         const contentMatch = post.content.toLowerCase().includes(tag.toLowerCase());
         return titleMatch || contentMatch;
@@ -888,18 +967,21 @@ function openReader(post) {
   activePost = post;
   modalTitle.textContent = post.title;
   
-  // Calculate views count including this new view
+  // Calculate views count including this new view if new to session
   const viewsCountMap = {};
   allViews.forEach(v => {
     viewsCountMap[v.post_id] = (viewsCountMap[v.post_id] || 0) + 1;
   });
-  const currentViews = (viewsCountMap[post.id] || 0) + 1;
+  
+  const sessionViewKey = `viewed_post_${post.id}`;
+  const isNewSessionView = !sessionStorage.getItem(sessionViewKey);
+  const currentViews = (viewsCountMap[post.id] || 0) + (isNewSessionView ? 1 : 0);
   
   modalDate.textContent = `${formatDate(post.date)}${post.time ? ' • ' + post.time : ''}`;
   modalReadTime.textContent = `${calculateReadTime(post.content)} • 👁️ ${currentViews} ${currentViews === 1 ? 'view' : 'views'}`;
   modalContent.innerHTML = formatPostContent(post.content);
   
-  // Log the view to database
+  // Log the view to database (deduplicated internally via sessionStorage check)
   trackPostView(post.id);
   
   // Load comments
@@ -922,6 +1004,24 @@ function closeReader() {
   document.body.style.overflow = ''; // Restore main scroll
   progressBar.style.width = '0%';
   activePost = null;
+  
+  // Re-render the active feed to show the updated views count
+  if (searchInput && searchInput.value.trim() !== '') {
+    handleSearch({ target: searchInput });
+  } else {
+    const activeTagPill = document.querySelector('.tag-pill.active');
+    if (activeTagPill && activeTagPill.getAttribute('data-tag') !== 'all') {
+      const tag = activeTagPill.getAttribute('data-tag');
+      const filtered = activeFeedPosts.filter(post => {
+        const titleMatch = post.title.toLowerCase().includes(tag.toLowerCase());
+        const contentMatch = post.content.toLowerCase().includes(tag.toLowerCase());
+        return titleMatch || contentMatch;
+      });
+      renderPosts(filtered);
+    } else {
+      renderPosts(activeFeedPosts);
+    }
+  }
 }
 
 // Update reading progress bar at top
@@ -940,13 +1040,49 @@ function updateReadingProgress() {
 // LIKES FUNCTIONALITY
 // ==========================================================================
 
-// Fetch likes, views, and feedback from backend
+// Fetch likes, views, feedback, and dynamic posts from backend
 async function fetchBackendData() {
   const backend = getBackendType();
   if (backend === 'standalone') {
     allLikes = JSON.parse(localStorage.getItem('local_likes') || '[]');
     allViews = JSON.parse(localStorage.getItem('local_views') || '[]');
     allFeedback = JSON.parse(localStorage.getItem('local_feedback') || '[]');
+    
+    // Handle local dynamic posts
+    const localDynamic = JSON.parse(localStorage.getItem('local_dynamic_posts') || '[]');
+    const decryptedDynamic = [];
+    for (const dp of localDynamic) {
+      try {
+        if (dp.encrypted_data) {
+          try {
+            const parsed = JSON.parse(dp.encrypted_data);
+            if (parsed && parsed.isPasswordHash) {
+              activeUserPasswordHash = parsed.hash;
+              continue;
+            }
+          } catch (e) {
+            // Not a metadata JSON, proceed to decryption
+          }
+        }
+        const decrypted = await decryptPayload(activeDecryptionPassword || "thoughts", JSON.parse(dp.encrypted_data));
+        decryptedDynamic.push({
+          id: Number(dp.id),
+          title: decrypted.title,
+          date: decrypted.date,
+          time: decrypted.time,
+          content: decrypted.content
+        });
+      } catch (err) {
+        console.error('Failed to decrypt local dynamic post:', dp.id, err);
+      }
+    }
+    const combined = [...decryptedPosts, ...decryptedDynamic];
+    combined.sort((a, b) => b.id - a.id);
+    activeFeedPosts = combined;
+    renderPosts(activeFeedPosts);
+    if (statPostCount) {
+      statPostCount.textContent = activeFeedPosts.length;
+    }
     updateLikesUI();
     return;
   }
@@ -959,16 +1095,65 @@ async function fetchBackendData() {
         allLikes = data.likes || [];
         allViews = data.views || [];
         allFeedback = data.feedback || [];
+        
+        // Handle dynamic posts from Google Sheets
+        const sheetDynamic = data.posts || [];
+        const decryptedDynamic = [];
+        for (const dp of sheetDynamic) {
+          try {
+            if (dp.encrypted_data) {
+              try {
+                const parsed = JSON.parse(dp.encrypted_data);
+                if (parsed && parsed.isPasswordHash) {
+                  activeUserPasswordHash = parsed.hash;
+                  continue;
+                }
+              } catch (e) {
+                // Not a metadata JSON, proceed to decryption
+              }
+            }
+            const decrypted = await decryptPayload(activeDecryptionPassword || "thoughts", JSON.parse(dp.encrypted_data));
+            decryptedDynamic.push({
+              id: Number(dp.id),
+              title: decrypted.title,
+              date: decrypted.date,
+              time: decrypted.time,
+              content: decrypted.content
+            });
+          } catch (err) {
+            console.error('Failed to decrypt sheet dynamic post:', dp.id, err);
+          }
+        }
+        const combined = [...decryptedPosts, ...decryptedDynamic];
+        // Remove duplicates just in case
+        const seenIds = new Set();
+        const uniqueCombined = [];
+        combined.forEach(p => {
+          if (!seenIds.has(p.id)) {
+            seenIds.add(p.id);
+            uniqueCombined.push(p);
+          }
+        });
+        uniqueCombined.sort((a, b) => b.id - a.id);
+        activeFeedPosts = uniqueCombined;
+        renderPosts(activeFeedPosts);
+        if (statPostCount) {
+          statPostCount.textContent = activeFeedPosts.length;
+        }
       } else {
         allLikes = JSON.parse(localStorage.getItem('local_likes') || '[]');
         allViews = JSON.parse(localStorage.getItem('local_views') || '[]');
         allFeedback = JSON.parse(localStorage.getItem('local_feedback') || '[]');
+        activeFeedPosts = [...decryptedPosts];
+        renderPosts(activeFeedPosts);
       }
     } catch (err) {
       console.error('Failed to load backend data from Google Sheets:', err);
       allLikes = JSON.parse(localStorage.getItem('local_likes') || '[]');
       allViews = JSON.parse(localStorage.getItem('local_views') || '[]');
       allFeedback = JSON.parse(localStorage.getItem('local_feedback') || '[]');
+      activeFeedPosts = [...decryptedPosts];
+      renderPosts(activeFeedPosts);
     }
     updateLikesUI();
     return;
@@ -980,6 +1165,8 @@ async function fetchBackendData() {
     allLikes = JSON.parse(localStorage.getItem('local_likes') || '[]');
     allViews = JSON.parse(localStorage.getItem('local_views') || '[]');
     allFeedback = JSON.parse(localStorage.getItem('local_feedback') || '[]');
+    activeFeedPosts = [...decryptedPosts];
+    renderPosts(activeFeedPosts);
     updateLikesUI();
     return;
   }
@@ -999,6 +1186,8 @@ async function fetchBackendData() {
     console.error('Failed to load likes from database:', err);
     allLikes = JSON.parse(localStorage.getItem('local_likes') || '[]');
   }
+  activeFeedPosts = [...decryptedPosts];
+  renderPosts(activeFeedPosts);
   updateLikesUI();
 }
 
@@ -1674,43 +1863,63 @@ async function deleteComment(commentId) {
 }
 
 // ==========================================================================
-// PASSWORD HASH GENERATOR (DRAWER TOOL)
+// REGULAR PASSWORD MANAGEMENT
 // ==========================================================================
 
-// Generate new SHA-256 hash (in Settings Drawer)
-async function generatePasswordHash() {
-  const text = newPasswordInput.value.trim();
-  if (!text) return;
+// Update the regular user login password (Admin only)
+async function handleAdminPasswordSubmit(e) {
+  e.preventDefault();
+  if (!newRegularPasswordInput) return;
+  
+  const newPassword = newRegularPasswordInput.value.trim();
+  if (!newPassword) return;
+  
+  if (!confirm('Are you sure you want to change the password for regular users?')) return;
+  
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Updating...';
+  }
   
   try {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(text);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hash = await sha256(newPassword);
+    const backend = getBackendType();
     
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    
-    hashResultOutput.value = hashHex;
-    hashResultWrapper.classList.remove('hidden');
-    copiedMsg.classList.add('hidden');
+    if (backend === 'standalone') {
+      const localDynamic = JSON.parse(localStorage.getItem('local_dynamic_posts') || '[]');
+      localDynamic.push({
+        id: Date.now(),
+        encrypted_data: JSON.stringify({ isPasswordHash: true, hash: hash }),
+        created_at: new Date().toISOString()
+      });
+      localStorage.setItem('local_dynamic_posts', JSON.stringify(localDynamic));
+      alert('Regular user password updated locally!');
+      newRegularPasswordInput.value = '';
+      await fetchBackendData();
+    } else if (backend === 'sheets') {
+      await fetch(BLOG_CONFIG.googleSheetsUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'posts',
+          encrypted_data: JSON.stringify({ isPasswordHash: true, hash: hash })
+        })
+      });
+      alert('Regular user password updated successfully in Google Sheets!');
+      newRegularPasswordInput.value = '';
+      setTimeout(fetchBackendData, 1200);
+    }
   } catch (err) {
-    console.error('Failed to generate hash:', err);
+    console.error('Failed to update regular user password:', err);
+    alert('Failed to update password: ' + err.message);
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Update User Password';
+    }
   }
-}
-
-// Copy hash result output to clipboard
-function copyHashResult() {
-  hashResultOutput.select();
-  navigator.clipboard.writeText(hashResultOutput.value)
-    .then(() => {
-      copiedMsg.classList.remove('hidden');
-      setTimeout(() => {
-        copiedMsg.classList.add('hidden');
-      }, 3000);
-    })
-    .catch(err => {
-      console.error('Failed to copy text:', err);
-    });
 }
 
 // ==========================================================================
@@ -1719,6 +1928,12 @@ function copyHashResult() {
 
 // Log post view
 async function trackPostView(postId) {
+  const sessionViewKey = `viewed_post_${postId}`;
+  if (sessionStorage.getItem(sessionViewKey)) {
+    return; // Already viewed this session, skip logging view
+  }
+  sessionStorage.setItem(sessionViewKey, 'true');
+
   const backend = getBackendType();
   const visitorId = getVisitorId();
   const post = decryptedPosts.find(p => Number(p.id) === Number(postId));
@@ -1925,5 +2140,87 @@ async function deleteFeedback(feedbackId) {
       console.error('Failed to delete feedback from Google Sheets:', err);
     }
     return;
+  }
+}
+
+// Handle Admin Publish Reflection Submit
+async function handleAdminPublishSubmit(e) {
+  e.preventDefault();
+  const titleEl = document.getElementById('postTitleInput');
+  const contentEl = document.getElementById('postContentInput');
+  if (!titleEl || !contentEl) return;
+  
+  const title = titleEl.value.trim();
+  const content = contentEl.value.trim();
+  if (!title || !content) return;
+  
+  const publishBtn = e.target.querySelector('button[type="submit"]');
+  if (publishBtn) {
+    publishBtn.disabled = true;
+    publishBtn.textContent = 'Publishing...';
+  }
+  
+  try {
+    const password = activeDecryptionPassword || "thoughts";
+    
+    // Get current date and time formatted
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-GB'); // DD/MM/YYYY
+    const dateParts = dateStr.split('/');
+    const shortDate = `${dateParts[0]}/${dateParts[1]}/${dateParts[2].slice(-2)}`; // DD/MM/YY
+    
+    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+    
+    const postPayload = {
+      title: title,
+      date: shortDate,
+      time: timeStr,
+      content: content
+    };
+    
+    // Encrypt post payload
+    const encrypted = await encryptPayload(password, postPayload);
+    const encryptedStr = JSON.stringify(encrypted);
+    
+    const backend = getBackendType();
+    
+    if (backend === 'standalone') {
+      const localDynamic = JSON.parse(localStorage.getItem('local_dynamic_posts') || '[]');
+      localDynamic.push({
+        id: Date.now(),
+        encrypted_data: encryptedStr,
+        created_at: now.toISOString()
+      });
+      localStorage.setItem('local_dynamic_posts', JSON.stringify(localDynamic));
+      alert('Thought published locally!');
+      titleEl.value = '';
+      contentEl.value = '';
+      await fetchBackendData(); // Reload and render combined feed
+    } else if (backend === 'sheets') {
+      await fetch(BLOG_CONFIG.googleSheetsUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'posts',
+          encrypted_data: encryptedStr
+        })
+      });
+      alert('Thought published successfully to Google Sheets!');
+      titleEl.value = '';
+      contentEl.value = '';
+      // Reload combined feed after a brief delay
+      setTimeout(async () => {
+        await fetchBackendData();
+      }, 1200);
+    }
+  } catch (err) {
+    console.error('Failed to publish dynamic post:', err);
+    alert('Failed to publish post: ' + err.message);
+  } finally {
+    if (publishBtn) {
+      publishBtn.disabled = false;
+      publishBtn.textContent = 'Publish Reflection';
+    }
   }
 }
