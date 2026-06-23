@@ -2030,3 +2030,49 @@ blockquote {
   background-color: var(--card-bg);
   color: var(--text-primary);
 }
+
+/* Bottom Modal Actions Bar */
+.modal-actions-bottom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 3rem 0 1rem;
+  padding: 1.5rem 0 0;
+  border-top: 1px dashed var(--card-border);
+}
+
+.modal-share-btn-bottom {
+  background: rgba(var(--accent-rgb), 0.05);
+  border: 1px solid rgba(var(--accent-rgb), 0.15);
+  color: var(--accent);
+  border-radius: 20px;
+  padding: 0.5rem 1.25rem;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.modal-share-btn-bottom svg {
+  color: var(--accent);
+  transition: var(--transition-fast);
+}
+
+.modal-share-btn-bottom:hover {
+  background: rgba(var(--accent-rgb), 0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.08);
+}
+
+.modal-share-btn-bottom:hover svg {
+  transform: scale(1.05);
+}
+
+.modal-share-btn-bottom:active {
+  transform: translateY(0);
+}

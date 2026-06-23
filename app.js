@@ -348,10 +348,18 @@ document.addEventListener('DOMContentLoaded', () => {
     adminPasswordForm.addEventListener('submit', handleAdminPasswordSubmit);
   }
 
-  // Modal like button event
+  // Modal like button event (Top & Bottom)
   const modalLikeBtn = document.getElementById('modalLikeBtn');
   if (modalLikeBtn) {
     modalLikeBtn.addEventListener('click', () => {
+      if (activePost) {
+        toggleLike(activePost.id);
+      }
+    });
+  }
+  const modalLikeBtnBottom = document.getElementById('modalLikeBtnBottom');
+  if (modalLikeBtnBottom) {
+    modalLikeBtnBottom.addEventListener('click', () => {
       if (activePost) {
         toggleLike(activePost.id);
       }
@@ -1301,18 +1309,29 @@ function updateLikesUI() {
     }
   });
 
-  // Update modal like button
+  // Update modal like button (Top & Bottom)
   if (activePost) {
     const modalLikeBtn = document.getElementById('modalLikeBtn');
     const modalLikeCount = document.getElementById('modalLikeCount');
+    const modalLikeBtnBottom = document.getElementById('modalLikeBtnBottom');
+    const modalLikeCountBottom = document.getElementById('modalLikeCountBottom');
     const count = likesCount[activePost.id] || 0;
     if (modalLikeCount) modalLikeCount.textContent = count;
+    if (modalLikeCountBottom) modalLikeCountBottom.textContent = count;
 
+    const hasLiked = visitorLiked.has(activePost.id);
     if (modalLikeBtn) {
-      if (visitorLiked.has(activePost.id)) {
+      if (hasLiked) {
         modalLikeBtn.classList.add('liked');
       } else {
         modalLikeBtn.classList.remove('liked');
+      }
+    }
+    if (modalLikeBtnBottom) {
+      if (hasLiked) {
+        modalLikeBtnBottom.classList.add('liked');
+      } else {
+        modalLikeBtnBottom.classList.remove('liked');
       }
     }
   }
@@ -2384,10 +2403,23 @@ function setupAdditionalFeatures() {
   }
   applyFontSize();
 
-  // Modal Share button handler
+  // Modal Share button handler (Top & Bottom)
   const modalShareBtn = document.getElementById('modalShareBtn');
   if (modalShareBtn) {
     modalShareBtn.addEventListener('click', () => {
+      if (activePost) {
+        const shareUrl = `${window.location.origin}${window.location.pathname}#post-${activePost.id}`;
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          showToast('Inquiry link copied to clipboard!');
+        }).catch(err => {
+          console.error('Could not copy text: ', err);
+        });
+      }
+    });
+  }
+  const modalShareBtnBottom = document.getElementById('modalShareBtnBottom');
+  if (modalShareBtnBottom) {
+    modalShareBtnBottom.addEventListener('click', () => {
       if (activePost) {
         const shareUrl = `${window.location.origin}${window.location.pathname}#post-${activePost.id}`;
         navigator.clipboard.writeText(shareUrl).then(() => {

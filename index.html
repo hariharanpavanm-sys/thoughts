@@ -531,6 +531,28 @@
           <!-- Full post content gets dynamically loaded here -->
         </div>
 
+        <!-- Bottom modal actions (Like / Share) for readers who scrolled to end of long posts -->
+        <div class="modal-actions-bottom">
+          <button id="modalLikeBtnBottom" class="modal-like-btn" title="Like post">
+            <svg class="heart-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+              </path>
+            </svg>
+            <span id="modalLikeCountBottom">0</span>
+          </button>
+          
+          <button id="modalShareBtnBottom" class="modal-share-btn-bottom" title="Copy Link to Inquiry">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+            <span>Share Link</span>
+          </button>
+        </div>
+
         <!-- Interactive Comments Section -->
         <hr class="modal-separator">
         <section class="comments-section">
