@@ -152,6 +152,7 @@ const blogTitleEl = document.getElementById('blogTitle');
 const blogSubtitleEl = document.getElementById('blogSubtitle');
 const standaloneBanner = document.getElementById('standaloneBanner');
 const statPostCount = document.getElementById('statPostCount');
+const postCount = document.getElementById('postCount');
 
 // Left Navigation & SPA Views Elements
 const navFeedBtn = document.getElementById('navFeedBtn');

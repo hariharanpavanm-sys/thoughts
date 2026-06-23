@@ -1661,3 +1661,11 @@ blockquote {
   display: flex;
   gap: 2px;
 }
+
+.post-count-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+  font-weight: 500;
+  display: block;
+}
