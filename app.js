@@ -5,6 +5,7 @@
 // Global state
 let decryptedPosts = [];
 let activeFeedPosts = []; // Merged static + dynamic posts
+let sheetDynamicPosts = []; // Loaded dynamic thoughts from backend
 let activeTheme = 'dark';
 let activePost = null;
 let isAdminLogged = false;
@@ -448,6 +449,7 @@ async function checkSavedSession() {
           localStorage.removeItem('admin_logged');
         }
         updateAdminVisibility();
+        mergeAndRenderFeeds();
         showApp();
       }
     } catch (err) {
@@ -503,6 +505,7 @@ async function handleLogin(e) {
       }
       
       updateAdminVisibility();
+      mergeAndRenderFeeds();
       showApp();
       
       const logType = isSuperAdmin ? 'Admin Login' : 'Visitor Login';
@@ -571,6 +574,7 @@ async function showApp() {
   
   switchView('feedView');   // Default to Feed SPA view
   searchInput.focus();
+  checkHashAndOpenPost();   // Open deep-linked inquiry if requested
 }
 
 // Fetch encrypted JSON and decrypt it
@@ -821,6 +825,30 @@ function formatDate(dateStr) {
   }
 }
 
+// Merge static decrypted posts and dynamic posts from backend, then render them
+function mergeAndRenderFeeds() {
+  const combined = [...decryptedPosts, ...sheetDynamicPosts];
+  
+  // Remove duplicates just in case
+  const seenIds = new Set();
+  const uniqueCombined = [];
+  combined.forEach(p => {
+    if (!seenIds.has(p.id)) {
+      seenIds.add(p.id);
+      uniqueCombined.push(p);
+    }
+  });
+  
+  uniqueCombined.sort((a, b) => b.id - a.id);
+  activeFeedPosts = uniqueCombined;
+  
+  renderPosts(activeFeedPosts);
+  
+  if (statPostCount) {
+    statPostCount.textContent = activeFeedPosts.length;
+  }
+}
+
 // Render post cards
 function renderPosts(postsToRender) {
   postsContainer.innerHTML = '';
@@ -876,23 +904,42 @@ function renderPosts(postsToRender) {
       <div class="post-excerpt">${formattedBody}</div>
       <div class="post-card-footer">
         <button class="read-more-btn" data-id="${post.id}">
-          <span>Open full thought</span>
+          <span>Unfold Inquiry</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="5" y1="12" x2="19" y2="12"></line>
             <polyline points="12 5 19 12 12 19"></polyline>
           </svg>
         </button>
-        <button class="like-btn" data-id="${post.id}" title="Like post">
-          <svg class="heart-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-          </svg>
-          <span class="like-count">0</span>
-        </button>
+        <div class="post-card-actions" style="display: flex; align-items: center; gap: 0.5rem;">
+          <button class="share-btn" data-id="${post.id}" title="Copy Link to Inquiry">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+          </button>
+          <button class="like-btn" data-id="${post.id}" title="Like post">
+            <svg class="heart-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+            <span class="like-count">0</span>
+          </button>
+        </div>
       </div>
     `;
     
     // Setup click handlers for reading mode
     card.querySelector('.read-more-btn').addEventListener('click', () => openReader(post));
+    
+    // Setup click handler for share button
+    card.querySelector('.share-btn').addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent opening reading panel
+      const shareUrl = `${window.location.origin}${window.location.pathname}#post-${post.id}`;
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        showToast('Inquiry link copied to clipboard!');
+      }).catch(err => {
+        console.error('Could not copy text: ', err);
+      });
+    });
     
     // Setup click handler for like button
     card.querySelector('.like-btn').addEventListener('click', (e) => {
@@ -967,6 +1014,14 @@ function openReader(post) {
   activePost = post;
   modalTitle.textContent = post.title;
   
+  // Set window location hash to deep link without triggering a loop
+  if (window.location.hash !== `#post-${post.id}`) {
+    history.pushState(null, null, `#post-${post.id}`);
+  }
+  
+  const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+  if (scrollToTopBtn) scrollToTopBtn.classList.remove('show');
+  
   // Calculate views count including this new view if new to session
   const viewsCountMap = {};
   allViews.forEach(v => {
@@ -999,11 +1054,18 @@ function openReader(post) {
 }
 
 // Close focused reader modal
-function closeReader() {
+function closeReader(updateHashState = true) {
   readingModal.classList.add('hidden');
   document.body.style.overflow = ''; // Restore main scroll
   progressBar.style.width = '0%';
   activePost = null;
+  
+  if (updateHashState && window.location.hash.startsWith('#post-')) {
+    history.pushState("", document.title, window.location.pathname + window.location.search);
+  }
+  
+  const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+  if (scrollToTopBtn) scrollToTopBtn.classList.remove('show');
   
   // Re-render the active feed to show the updated views count
   if (searchInput && searchInput.value.trim() !== '') {
@@ -1076,13 +1138,8 @@ async function fetchBackendData() {
         console.error('Failed to decrypt local dynamic post:', dp.id, err);
       }
     }
-    const combined = [...decryptedPosts, ...decryptedDynamic];
-    combined.sort((a, b) => b.id - a.id);
-    activeFeedPosts = combined;
-    renderPosts(activeFeedPosts);
-    if (statPostCount) {
-      statPostCount.textContent = activeFeedPosts.length;
-    }
+    sheetDynamicPosts = decryptedDynamic;
+    mergeAndRenderFeeds();
     updateLikesUI();
     return;
   }
@@ -1124,36 +1181,20 @@ async function fetchBackendData() {
             console.error('Failed to decrypt sheet dynamic post:', dp.id, err);
           }
         }
-        const combined = [...decryptedPosts, ...decryptedDynamic];
-        // Remove duplicates just in case
-        const seenIds = new Set();
-        const uniqueCombined = [];
-        combined.forEach(p => {
-          if (!seenIds.has(p.id)) {
-            seenIds.add(p.id);
-            uniqueCombined.push(p);
-          }
-        });
-        uniqueCombined.sort((a, b) => b.id - a.id);
-        activeFeedPosts = uniqueCombined;
-        renderPosts(activeFeedPosts);
-        if (statPostCount) {
-          statPostCount.textContent = activeFeedPosts.length;
-        }
+        sheetDynamicPosts = decryptedDynamic;
+        mergeAndRenderFeeds();
       } else {
         allLikes = JSON.parse(localStorage.getItem('local_likes') || '[]');
         allViews = JSON.parse(localStorage.getItem('local_views') || '[]');
         allFeedback = JSON.parse(localStorage.getItem('local_feedback') || '[]');
-        activeFeedPosts = [...decryptedPosts];
-        renderPosts(activeFeedPosts);
+        mergeAndRenderFeeds();
       }
     } catch (err) {
       console.error('Failed to load backend data from Google Sheets:', err);
       allLikes = JSON.parse(localStorage.getItem('local_likes') || '[]');
       allViews = JSON.parse(localStorage.getItem('local_views') || '[]');
       allFeedback = JSON.parse(localStorage.getItem('local_feedback') || '[]');
-      activeFeedPosts = [...decryptedPosts];
-      renderPosts(activeFeedPosts);
+      mergeAndRenderFeeds();
     }
     updateLikesUI();
     return;
@@ -1165,8 +1206,7 @@ async function fetchBackendData() {
     allLikes = JSON.parse(localStorage.getItem('local_likes') || '[]');
     allViews = JSON.parse(localStorage.getItem('local_views') || '[]');
     allFeedback = JSON.parse(localStorage.getItem('local_feedback') || '[]');
-    activeFeedPosts = [...decryptedPosts];
-    renderPosts(activeFeedPosts);
+    mergeAndRenderFeeds();
     updateLikesUI();
     return;
   }
@@ -2224,3 +2264,150 @@ async function handleAdminPublishSubmit(e) {
     }
   }
 }
+
+// ==========================================================================
+// INQUIRY SHARING, TOASTS, SCROLL NAVIGATORS & TEXT SCALING
+// ==========================================================================
+
+// Global Toast helper
+function showToast(message) {
+  let toast = document.getElementById('customToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'customToast';
+    toast.className = 'toast-notification';
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML = `
+    <svg class="toast-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+    <span>${message}</span>
+  `;
+  // Trigger reflow
+  toast.offsetHeight;
+  toast.classList.add('show');
+  
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3000);
+}
+
+// Deep Linking: Check URL hash and open post if matched
+function checkHashAndOpenPost() {
+  const hash = window.location.hash;
+  if (hash.startsWith('#post-')) {
+    const postId = hash.substring(6);
+    // Find the post
+    const post = activeFeedPosts.find(p => String(p.id) === postId);
+    if (post) {
+      openReader(post);
+    }
+  }
+}
+
+// Modal Font Size adjusters
+let currentFontSizeLevel = Number(localStorage.getItem('modal_font_size_level') || 0); // ranges from -2 to 3
+const fontSizes = ['0.95rem', '1.08rem', '1.18rem', '1.3rem', '1.45rem', '1.6rem'];
+
+function applyFontSize() {
+  const size = fontSizes[currentFontSizeLevel + 2]; // 0 corresponds to index 2
+  const modalContent = document.getElementById('modalContent');
+  if (modalContent) {
+    modalContent.style.setProperty('--modal-font-size', size);
+  }
+  const decBtn = document.getElementById('fontSizeDecBtn');
+  const incBtn = document.getElementById('fontSizeIncBtn');
+  if (decBtn) decBtn.disabled = (currentFontSizeLevel === -2);
+  if (incBtn) incBtn.disabled = (currentFontSizeLevel === 3);
+}
+
+// Init font scaling & click bindings, deep linking listeners, and scroll-to-top behaviors
+function setupAdditionalFeatures() {
+  // Bind Font size adjuster actions
+  const decBtn = document.getElementById('fontSizeDecBtn');
+  const incBtn = document.getElementById('fontSizeIncBtn');
+  if (decBtn) {
+    decBtn.addEventListener('click', () => {
+      if (currentFontSizeLevel > -2) {
+        currentFontSizeLevel--;
+        localStorage.setItem('modal_font_size_level', currentFontSizeLevel);
+        applyFontSize();
+      }
+    });
+  }
+  if (incBtn) {
+    incBtn.addEventListener('click', () => {
+      if (currentFontSizeLevel < 3) {
+        currentFontSizeLevel++;
+        localStorage.setItem('modal_font_size_level', currentFontSizeLevel);
+        applyFontSize();
+      }
+    });
+  }
+  applyFontSize();
+
+  // Modal Share button handler
+  const modalShareBtn = document.getElementById('modalShareBtn');
+  if (modalShareBtn) {
+    modalShareBtn.addEventListener('click', () => {
+      if (activePost) {
+        const shareUrl = `${window.location.origin}${window.location.pathname}#post-${activePost.id}`;
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          showToast('Inquiry link copied to clipboard!');
+        }).catch(err => {
+          console.error('Could not copy text: ', err);
+        });
+      }
+    });
+  }
+
+  // Scroll to Top action
+  const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+  if (scrollToTopBtn) {
+    scrollToTopBtn.addEventListener('click', () => {
+      if (!readingModal.classList.contains('hidden')) {
+        readingModal.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      } else {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      }
+    });
+
+    const handleScroll = () => {
+      const scrollPos = !readingModal.classList.contains('hidden') ? readingModal.scrollTop : window.scrollY;
+      if (scrollPos > 400) {
+        scrollToTopBtn.classList.add('show');
+      } else {
+        scrollToTopBtn.classList.remove('show');
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    readingModal.addEventListener('scroll', handleScroll);
+  }
+
+  // Hashchange events (back-button close or direct linking)
+  window.addEventListener('hashchange', () => {
+    if (!blogApp.classList.contains('hidden')) {
+      const hash = window.location.hash;
+      if (hash.startsWith('#post-')) {
+        checkHashAndOpenPost();
+      } else {
+        if (!readingModal.classList.contains('hidden')) {
+          closeReader(false); // Close reader without overwriting history again
+        }
+      }
+    }
+  });
+}
+
+// Invoke setup for additional elements on load
+document.addEventListener('DOMContentLoaded', () => {
+  setupAdditionalFeatures();
+});
