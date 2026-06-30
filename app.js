@@ -8,7 +8,7 @@ if (typeof BLOG_CONFIG === 'undefined') {
     title: "The Seeker",
     description: "A private journal seeking the purpose of human life",
     author: "Hari",
-    adminPasswordHash: "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
+    adminPasswordHash: "",
     googleSheetsUrl: ""
   };
 }
@@ -519,12 +519,6 @@ async function checkSavedSession() {
       unlockBtn.disabled = true;
       unlockBtn.querySelector('span').textContent = 'Decrypting...';
 
-      // Check if saved password is admin
-      let isSuperAdmin = false;
-      if (savedPassword) {
-        const hash = await sha256(savedPassword);
-        isSuperAdmin = (hash === BLOG_CONFIG.adminPasswordHash);
-      }
       const decryptPassword = "thoughts";
 
       const decrypted = await fetchAndDecrypt(decryptPassword);
@@ -543,6 +537,13 @@ async function checkSavedSession() {
           }
         }
         decryptedPosts = posts;
+
+        // Check if saved password is admin (using the decrypted config!)
+        let isSuperAdmin = false;
+        if (savedPassword) {
+          const hash = await sha256(savedPassword);
+          isSuperAdmin = (hash === BLOG_CONFIG.adminPasswordHash);
+        }
 
         // Fetch backend stats/likes/views now that sheets URL is decrypted
         if (!Array.isArray(decrypted) && decrypted.config && decrypted.config.googleSheetsUrl) {
@@ -594,18 +595,6 @@ async function handleLogin(e) {
   unlockBtn.disabled = true;
   unlockBtn.querySelector('span').textContent = 'Decrypting...';
 
-  try {
-    let isSuperAdmin = false;
-    if (password) {
-      const hash = await sha256(password);
-      isSuperAdmin = (hash === BLOG_CONFIG.adminPasswordHash);
-      if (!isSuperAdmin) {
-        showLoginError('Incorrect admin password. Leave it blank if you are a normal user.');
-        writeAccessLog('Visitor Login', 'Blocked (Invalid Admin Password)');
-        return;
-      }
-    }
-
     const decryptPassword = "thoughts";
     const decrypted = await fetchAndDecrypt(decryptPassword);
     if (decrypted) {
@@ -623,6 +612,18 @@ async function handleLogin(e) {
         }
       }
       decryptedPosts = posts;
+
+      // Now verify if the typed password matches the decrypted adminPasswordHash
+      let isSuperAdmin = false;
+      if (password) {
+        const hash = await sha256(password);
+        isSuperAdmin = (hash === BLOG_CONFIG.adminPasswordHash);
+        if (!isSuperAdmin) {
+          showLoginError('Incorrect admin password. Leave it blank if you are a normal user.');
+          writeAccessLog('Visitor Login', 'Blocked (Invalid Admin Password)');
+          return;
+        }
+      }
 
       // Fetch backend stats/likes/views now that sheets URL is decrypted
       if (!Array.isArray(decrypted) && decrypted.config && decrypted.config.googleSheetsUrl) {
@@ -1228,8 +1229,8 @@ function openReader(post) {
     history.pushState(null, null, `#post-${post.id}`);
   }
 
-  const scrollToTopBtn = document.getElementById('scrollToTopBtn');
-  if (scrollToTopBtn) scrollToTopBtn.classList.remove('show');
+  const scrollNavGroup = document.getElementById('scrollNavGroup');
+  if (scrollNavGroup) scrollNavGroup.classList.remove('show');
 
   // Calculate views count including this new view if new to session
   const viewsCountMap = {};
@@ -2553,34 +2554,70 @@ function setupAdditionalFeatures() {
     });
   }
 
-  // Scroll to Top action
+  // Scroll Progress and Floating Navigators (Top & Bottom)
+  const scrollNavGroup = document.getElementById('scrollNavGroup');
   const scrollToTopBtn = document.getElementById('scrollToTopBtn');
-  if (scrollToTopBtn) {
-    scrollToTopBtn.addEventListener('click', () => {
-      if (!readingModal.classList.contains('hidden')) {
-        readingModal.scrollTo({
-          top: 0,
-          behavior: 'smooth'
-        });
-      } else {
-        window.scrollTo({
-          top: 0,
-          behavior: 'smooth'
-        });
-      }
-    });
+  const scrollToBottomBtn = document.getElementById('scrollToBottomBtn');
 
+  if (scrollNavGroup) {
     const handleScroll = () => {
-      const scrollPos = !readingModal.classList.contains('hidden') ? readingModal.scrollTop : window.scrollY;
-      if (scrollPos > 400) {
-        scrollToTopBtn.classList.add('show');
+      let scrollPos = 0;
+      let scrollHeight = 0;
+      let clientHeight = 0;
+
+      const isModalOpen = !readingModal.classList.contains('hidden');
+
+      if (isModalOpen) {
+        scrollPos = readingModal.scrollTop;
+        scrollHeight = readingModal.scrollHeight;
+        clientHeight = readingModal.clientHeight;
       } else {
-        scrollToTopBtn.classList.remove('show');
+        scrollPos = window.scrollY;
+        scrollHeight = document.documentElement.scrollHeight;
+        clientHeight = document.documentElement.clientHeight;
+      }
+
+      // 1. Show or hide the floating buttons group
+      if (scrollPos > 300) {
+        scrollNavGroup.classList.add('show');
+      } else {
+        scrollNavGroup.classList.remove('show');
+      }
+
+      // 2. Update reading progress bar width
+      const totalScrollable = scrollHeight - clientHeight;
+      if (totalScrollable > 0) {
+        const percentage = (scrollPos / totalScrollable) * 100;
+        progressBar.style.width = percentage + '%';
+      } else {
+        progressBar.style.width = '0%';
       }
     };
 
     window.addEventListener('scroll', handleScroll);
     readingModal.addEventListener('scroll', handleScroll);
+
+    // Scroll to Top action
+    if (scrollToTopBtn) {
+      scrollToTopBtn.addEventListener('click', () => {
+        if (!readingModal.classList.contains('hidden')) {
+          readingModal.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      });
+    }
+
+    // Scroll to Bottom action
+    if (scrollToBottomBtn) {
+      scrollToBottomBtn.addEventListener('click', () => {
+        if (!readingModal.classList.contains('hidden')) {
+          readingModal.scrollTo({ top: readingModal.scrollHeight, behavior: 'smooth' });
+        } else {
+          window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
+        }
+      });
+    }
   }
 
   // Hashchange events (back-button close or direct linking)

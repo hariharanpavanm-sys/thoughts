@@ -1932,13 +1932,44 @@ blockquote {
   cursor: not-allowed;
 }
 
-/* Scroll to Top Navigator */
-.scroll-to-top-btn {
+/* Top Scroll Progress Bar */
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 4px;
+  background: linear-gradient(to right, var(--accent), var(--accent-hover));
+  width: 0%;
+  z-index: 9999; /* Higher than header and modal overlays */
+  transition: width 0.1s ease-out;
+}
+
+/* Floating Scroll Navigators (Top & Bottom) */
+.scroll-navigators-group {
   position: fixed;
   bottom: 2.5rem;
   right: 2.5rem;
-  width: 48px;
-  height: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+              opacity 0.3s ease, 
+              visibility 0.3s;
+  z-index: 999;
+}
+
+.scroll-navigators-group.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.scroll-nav-btn {
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: rgba(18, 24, 38, 0.8);
   backdrop-filter: blur(12px) saturate(180%);
@@ -1950,36 +1981,21 @@ blockquote {
   align-items: center;
   justify-content: center;
   box-shadow: var(--shadow-md);
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(20px);
-  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
-              opacity 0.3s ease, 
-              visibility 0.3s, 
-              color 0.2s, 
-              border-color 0.2s, 
-              background-color 0.2s;
-  z-index: 999;
+  transition: var(--transition-fast);
 }
 
-.light-mode .scroll-to-top-btn {
+.light-mode .scroll-nav-btn {
   background: rgba(255, 255, 255, 0.85);
 }
 
-.scroll-to-top-btn.show {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
-
-.scroll-to-top-btn:hover {
+.scroll-nav-btn:hover {
   color: var(--accent);
   border-color: var(--card-hover-border);
   background: var(--card-bg);
-  transform: translateY(-3px);
+  transform: translateY(-2px);
 }
 
-.scroll-to-top-btn:active {
+.scroll-nav-btn:active {
   transform: scale(0.95);
 }
 
