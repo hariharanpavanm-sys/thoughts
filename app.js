@@ -71,10 +71,10 @@ function getClientSpecs() {
   }
 
   // 2. Detect OS
-  if (/Windows NT/i.test(ua)) os = 'Windows';
-  else if (/Macintosh|Mac OS X/i.test(ua)) os = 'macOS';
-  else if (/iPhone|iPad|iPod/i.test(ua)) os = 'iOS';
+  if (/iPhone|iPad|iPod/i.test(ua)) os = 'iOS';
   else if (/Android/i.test(ua)) os = 'Android';
+  else if (/Windows NT/i.test(ua)) os = 'Windows';
+  else if (/Macintosh|Mac OS X/i.test(ua)) os = 'macOS';
   else if (/Linux/i.test(ua)) os = 'Linux';
 
   // 3. Detect Browser
@@ -128,7 +128,11 @@ async function writeAccessLog(action, status) {
           user: currentUser,
           activity: activityStr,
           session_id: sessionId,
-          browser_traceback: tracebackStr
+          device: specs.device,
+          os: specs.os,
+          browser: specs.browser,
+          resolution: specs.resolution,
+          browser_traceback: userAgent
         })
       });
     } catch (err) {
@@ -559,7 +563,7 @@ async function checkSavedSession() {
         showApp();
 
         const logType = isSuperAdmin ? 'Admin Auto-Login' : 'Visitor Auto-Login';
-        writeAccessLog(logType, `Success (Session Restored, Name: ${savedName})`);
+        writeAccessLog(logType, 'Success (Session Restored)');
       }
     } catch (err) {
       console.warn('Saved session expired or invalid.');
@@ -597,7 +601,7 @@ async function handleLogin(e) {
       isSuperAdmin = (hash === BLOG_CONFIG.adminPasswordHash);
       if (!isSuperAdmin) {
         showLoginError('Incorrect admin password. Leave it blank if you are a normal user.');
-        writeAccessLog('Visitor Login', `Blocked (Invalid Admin Password, Name: ${name})`);
+        writeAccessLog('Visitor Login', 'Blocked (Invalid Admin Password)');
         return;
       }
     }
@@ -643,10 +647,10 @@ async function handleLogin(e) {
       showApp();
 
       const logType = isSuperAdmin ? 'Admin Login' : 'Visitor Login';
-      writeAccessLog(logType, `Success (Name: ${name})`);
+      writeAccessLog(logType, 'Success');
     } else {
       showLoginError('System Error: Unable to decrypt with key.');
-      writeAccessLog('Visitor Login', `Blocked (Decryption Failure, Name: ${name})`);
+      writeAccessLog('Visitor Login', 'Blocked (Decryption Failure)');
     }
   } catch (err) {
     console.error(err);
@@ -657,7 +661,7 @@ async function handleLogin(e) {
     } else {
       showLoginError('System Error: Unable to decrypt the archive. Make sure to run the python encrypt.py script.');
     }
-    writeAccessLog('Visitor Login', `Blocked (System Decryption Failure, Name: ${name})`);
+    writeAccessLog('Visitor Login', 'Blocked (System Decryption Failure)');
   } finally {
     unlockBtn.disabled = false;
     unlockBtn.querySelector('span').textContent = 'Enter';
@@ -701,7 +705,7 @@ function handleLogout() {
   const name = localStorage.getItem('visitor_name') || 'Guest';
   const isAdmin = localStorage.getItem('admin_mode') === 'true';
   const logType = isAdmin ? 'Admin Logout' : 'Visitor Logout';
-  writeAccessLog(logType, `Success (Name: ${name})`);
+  writeAccessLog(logType, 'Success');
 
   localStorage.removeItem('journal_password');
   decryptedPosts = [];
