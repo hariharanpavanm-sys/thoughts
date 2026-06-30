@@ -2142,3 +2142,91 @@ blockquote {
 .modal-share-btn-bottom:active {
   transform: translateY(0);
 }
+
+/* Custom Confirmation Modal Styling */
+.confirm-modal-container {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  width: 95%;
+  max-width: 400px;
+  padding: 1.75rem;
+  box-shadow: var(--shadow-lg);
+  animation: modalFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--text-primary);
+  text-align: center;
+  margin: auto;
+}
+
+.confirm-modal-header h3 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.confirm-modal-body p {
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.confirm-modal-footer {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.confirm-btn-secondary {
+  background: transparent;
+  border: 1px solid var(--card-border);
+  color: var(--text-primary);
+  padding: 0.6rem 1.25rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: var(--transition-fast);
+}
+
+.confirm-btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: var(--text-muted);
+}
+
+.confirm-btn-primary {
+  background-color: var(--accent);
+  border: none;
+  color: var(--bg-color); /* Contrast text color */
+  padding: 0.6rem 1.25rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: var(--transition-fast);
+}
+
+.confirm-btn-primary:hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.light-mode .confirm-btn-primary {
+  color: #ffffff; /* Amber has white text on light mode */
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

@@ -253,6 +253,11 @@ const commentAuthor = document.getElementById('commentAuthor');
 const commentText = document.getElementById('commentText');
 const commentCount = document.getElementById('commentCount');
 
+// Logout Confirmation Elements
+const logoutModal = document.getElementById('logoutModal');
+const logoutConfirmYesBtn = document.getElementById('logoutConfirmYesBtn');
+const logoutConfirmNoBtn = document.getElementById('logoutConfirmNoBtn');
+
 // Admin Password Management Elements (Obsolete)
 // const adminPasswordForm = document.getElementById('adminPasswordForm');
 // const newRegularPasswordInput = document.getElementById('newRegularPasswordInput');
@@ -334,7 +339,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Event Listeners
   loginForm.addEventListener('submit', handleLogin);
-  logoutBtn.addEventListener('click', handleLogout);
+  logoutBtn.addEventListener('click', showLogoutConfirmation);
+  if (logoutConfirmYesBtn) logoutConfirmYesBtn.addEventListener('click', handleLogout);
+  if (logoutConfirmNoBtn) logoutConfirmNoBtn.addEventListener('click', closeLogoutConfirmation);
+  if (logoutModal) {
+    logoutModal.addEventListener('click', (e) => {
+      if (e.target === logoutModal) closeLogoutConfirmation();
+    });
+  }
   themeToggle.addEventListener('click', toggleTheme);
 
   // Admin password reveal toggle logic
@@ -668,11 +680,23 @@ function showLoginError(msg) {
   passwordInput.select();
 }
 
+// Show custom logout modal
+function showLogoutConfirmation() {
+  if (logoutModal) {
+    logoutModal.classList.remove('hidden');
+  }
+}
+
+// Close custom logout modal
+function closeLogoutConfirmation() {
+  if (logoutModal) {
+    logoutModal.classList.add('hidden');
+  }
+}
+
 // Handle Logout (Lock)
 function handleLogout() {
-  if (!confirm('Are you sure you want to logout?')) {
-    return;
-  }
+  closeLogoutConfirmation();
 
   const name = localStorage.getItem('visitor_name') || 'Guest';
   const isAdmin = localStorage.getItem('admin_mode') === 'true';
