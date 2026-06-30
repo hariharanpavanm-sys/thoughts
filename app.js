@@ -293,23 +293,21 @@ document.addEventListener('DOMContentLoaded', () => {
   themeToggle.addEventListener('click', toggleTheme);
 
   // Admin password reveal toggle logic
-  const adminToggleLink = document.getElementById('adminToggleLink');
+  const adminToggleBtn = document.getElementById('adminToggleBtn');
   const passwordGroup = document.getElementById('passwordGroup');
-  if (adminToggleLink && passwordGroup && passwordInput) {
-    const revealPassword = () => {
-      passwordGroup.classList.remove('collapsed');
-    };
-    const hidePassword = () => {
-      if (document.activeElement !== passwordInput && !passwordInput.value) {
+  if (adminToggleBtn && passwordGroup && passwordInput) {
+    adminToggleBtn.addEventListener('click', () => {
+      const isCollapsed = passwordGroup.classList.contains('collapsed');
+      if (isCollapsed) {
+        passwordGroup.classList.remove('collapsed');
+        adminToggleBtn.classList.add('active');
+        passwordInput.focus();
+      } else {
         passwordGroup.classList.add('collapsed');
+        adminToggleBtn.classList.remove('active');
+        passwordInput.value = '';
       }
-    };
-    adminToggleLink.addEventListener('mouseenter', revealPassword);
-    adminToggleLink.addEventListener('click', () => {
-      revealPassword();
-      passwordInput.focus();
     });
-    passwordInput.addEventListener('blur', hidePassword);
   }
 
   searchInput.addEventListener('input', handleSearch);
@@ -593,6 +591,12 @@ function handleLogout() {
   decryptedPosts = [];
   passwordInput.value = '';
   loginError.classList.remove('show');
+
+  // Reset admin toggle elements
+  const adminToggleBtn = document.getElementById('adminToggleBtn');
+  const passwordGroup = document.getElementById('passwordGroup');
+  if (adminToggleBtn) adminToggleBtn.classList.remove('active');
+  if (passwordGroup) passwordGroup.classList.add('collapsed');
 
   // Clear welcome greeting
   const welcomeUserEl = document.getElementById('welcomeUser');
