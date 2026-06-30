@@ -2322,3 +2322,33 @@ blockquote {
 .light-mode .theme-toggle-login-btn:hover {
   background: rgba(0, 0, 0, 0.05);
 }
+
+/* Comment / Reflection Indicator Button Styling */
+.comment-indicator-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.4rem 0.75rem;
+  border-radius: 20px;
+  transition: var(--transition-smooth);
+}
+
+.comment-indicator-btn:hover {
+  color: var(--accent);
+  background-color: rgba(var(--accent-rgb), 0.05);
+}
+
+.comment-indicator-btn svg {
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.comment-indicator-btn:active svg {
+  transform: scale(1.3);
+}

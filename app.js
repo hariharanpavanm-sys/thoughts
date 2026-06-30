@@ -1041,6 +1041,7 @@ function mergeAndRenderFeeds() {
   if (statPostCount) {
     statPostCount.textContent = activeFeedPosts.length;
   }
+  checkHashAndOpenPost();
 }
 
 // Render post cards
@@ -1141,6 +1142,12 @@ function renderPosts(postsToRender) {
               <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
             </svg>
           </button>
+          <button class="comment-indicator-btn" data-id="${post.id}" title="View reflections">
+            <svg class="comment-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span class="comment-count-label">${commentsCount}</span>
+          </button>
           <button class="like-btn" data-id="${post.id}" title="Like post">
             <svg class="heart-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
@@ -1163,6 +1170,12 @@ function renderPosts(postsToRender) {
       }).catch(err => {
         console.error('Could not copy text: ', err);
       });
+    });
+
+    // Setup click handler for comments button
+    card.querySelector('.comment-indicator-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      openReader(post);
     });
 
     // Setup click handler for like button
@@ -1802,7 +1815,8 @@ async function handleCommentSubmit(e) {
 
 // Simple HTML escaping helper
 function escapeHtml(str) {
-  return str
+  if (str === null || str === undefined) return '';
+  return String(str)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -2471,11 +2485,13 @@ function showToast(message) {
 
 // Deep Linking: Check URL hash and open post if matched
 function checkHashAndOpenPost() {
+  if (blogApp.classList.contains('hidden')) return;
+
   const hash = window.location.hash;
   if (hash.startsWith('#post-')) {
     const postId = hash.substring(6);
-    // Find the post
-    const post = activeFeedPosts.find(p => String(p.id) === postId);
+    // Find the post by string or number comparison
+    const post = activeFeedPosts.find(p => String(p.id) === postId || Number(p.id) === Number(postId));
     if (post) {
       openReader(post);
     }
