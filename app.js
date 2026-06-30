@@ -351,7 +351,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.target === logoutModal) closeLogoutConfirmation();
     });
   }
-  themeToggle.addEventListener('click', toggleTheme);
+  if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
+  const themeToggleLogin = document.querySelector('.theme-toggle-login-btn');
+  if (themeToggleLogin) themeToggleLogin.addEventListener('click', toggleTheme);
 
   // Admin password reveal toggle logic
   const adminToggleBtn = document.getElementById('adminToggleBtn');
@@ -484,16 +486,18 @@ function applyConfig() {
 // Set Theme (light-mode or dark-mode)
 function setTheme(theme) {
   activeTheme = theme;
+  const sunIcons = document.querySelectorAll('.sun-icon');
+  const moonIcons = document.querySelectorAll('.moon-icon');
   if (theme === 'light') {
     document.body.classList.remove('dark-mode');
     document.body.classList.add('light-mode');
-    sunIcon.classList.remove('hidden');
-    moonIcon.classList.add('hidden');
+    sunIcons.forEach(icon => icon.classList.remove('hidden'));
+    moonIcons.forEach(icon => icon.classList.add('hidden'));
   } else {
     document.body.classList.remove('light-mode');
     document.body.classList.add('dark-mode');
-    sunIcon.classList.add('hidden');
-    moonIcon.classList.remove('hidden');
+    sunIcons.forEach(icon => icon.classList.add('hidden'));
+    moonIcons.forEach(icon => icon.classList.remove('hidden'));
   }
   localStorage.setItem('theme', theme);
 }

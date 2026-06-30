@@ -2288,3 +2288,37 @@ blockquote {
   scrollbar-width: thin;
   scrollbar-color: rgba(var(--accent-rgb), 0.15) transparent;
 }
+
+/* Lock Screen Floating Theme Toggle */
+.lock-screen-theme-toggle {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 100;
+}
+
+.theme-toggle-login-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--card-border);
+  padding: 0.65rem;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+  color: var(--text-primary);
+}
+
+.theme-toggle-login-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: scale(1.05);
+}
+
+.light-mode .theme-toggle-login-btn {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.light-mode .theme-toggle-login-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
