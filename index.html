@@ -47,15 +47,15 @@
 
       <div class="lock-form-container">
         <h2 class="lock-form-title">Seeking to Knowing</h2>
-        <p class="lock-form-desc">Provide your name and password to access the journal</p>
+        <p class="lock-form-desc">Provide your name to access the journal. Password only required for Admin.</p>
 
         <form id="loginForm" class="login-form">
           <div class="input-group">
             <input type="text" id="visitorNameInput" placeholder="Enter your name..." required>
           </div>
           <div class="input-group">
-            <input type="password" id="passwordInput" placeholder="Enter password to unlock..."
-              autocomplete="current-password" required>
+            <input type="password" id="passwordInput" placeholder="Password (Admin only)..."
+              autocomplete="current-password">
           </div>
           <button type="submit" id="unlockBtn" class="unlock-btn">
             <span>Enter</span>
@@ -315,21 +315,6 @@
                 </form>
               </div>
 
-              <!-- Manage User Password Form (Only visible to admin) -->
-              <div id="adminPasswordSection" class="dashboard-table-container admin-publish-section"
-                style="margin-bottom: 3rem;">
-                <h3>Manage Journal Password</h3>
-                <p class="admin-dashboard-subtitle" style="margin-top: 0.25rem; margin-bottom: 1rem;">Update the
-                  password that regular users must enter to unlock the journal.</p>
-                <form id="adminPasswordForm" class="comment-form feedback-form-box">
-                  <div class="form-row">
-                    <input type="password" id="newRegularPasswordInput" placeholder="Enter new regular user password..."
-                      required autocomplete="new-password">
-                  </div>
-                  <button type="submit" class="submit-comment-btn"
-                    style="background-color: var(--accent); color: #0b0f19;">Update User Password</button>
-                </form>
-              </div>
 
               <!-- Stats Counter Row -->
               <div class="analytics-grid">

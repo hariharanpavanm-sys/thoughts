@@ -208,9 +208,9 @@ const commentAuthor = document.getElementById('commentAuthor');
 const commentText = document.getElementById('commentText');
 const commentCount = document.getElementById('commentCount');
 
-// Admin Password Management Elements
-const adminPasswordForm = document.getElementById('adminPasswordForm');
-const newRegularPasswordInput = document.getElementById('newRegularPasswordInput');
+// Admin Password Management Elements (Obsolete)
+// const adminPasswordForm = document.getElementById('adminPasswordForm');
+// const newRegularPasswordInput = document.getElementById('newRegularPasswordInput');
 
 // Detect and update admin buttons display based on access mode
 function updateAdminVisibility() {
@@ -343,10 +343,10 @@ document.addEventListener('DOMContentLoaded', () => {
     adminPublishForm.addEventListener('submit', handleAdminPublishSubmit);
   }
 
-  // Admin password change form event
-  if (adminPasswordForm) {
-    adminPasswordForm.addEventListener('submit', handleAdminPasswordSubmit);
-  }
+  // Admin password change form event (Obsolete)
+  // if (adminPasswordForm) {
+  //   adminPasswordForm.addEventListener('submit', handleAdminPasswordSubmit);
+  // }
 
   // Modal like button event (Top & Bottom)
   const modalLikeBtn = document.getElementById('modalLikeBtn');
@@ -424,24 +424,29 @@ function toggleTheme() {
   setTheme(activeTheme === 'dark' ? 'light' : 'dark');
 }
 
-// Check if password exists in local storage
+// Check if session exists in local storage
 async function checkSavedSession() {
   if (startupFetchPromise) {
     await startupFetchPromise;
   }
 
-  const savedPassword = localStorage.getItem('journal_password');
-  if (savedPassword) {
+  const savedName = localStorage.getItem('visitor_name');
+  if (savedName) {
     try {
-      passwordInput.value = savedPassword;
+      const savedPassword = localStorage.getItem('journal_password') || '';
+      if (savedPassword && passwordInput) {
+        passwordInput.value = savedPassword;
+      }
       unlockBtn.disabled = true;
       unlockBtn.querySelector('span').textContent = 'Decrypting...';
 
-      // Check if saved password is admin or custom user password
-      const hash = await sha256(savedPassword);
-      const isSuperAdmin = (hash === BLOG_CONFIG.adminPasswordHash);
-      const isCustomUser = (activeUserPasswordHash && hash === activeUserPasswordHash);
-      const decryptPassword = (isSuperAdmin || isCustomUser) ? "thoughts" : savedPassword;
+      // Check if saved password is admin
+      let isSuperAdmin = false;
+      if (savedPassword) {
+        const hash = await sha256(savedPassword);
+        isSuperAdmin = (hash === BLOG_CONFIG.adminPasswordHash);
+      }
+      const decryptPassword = "thoughts";
 
       const decrypted = await fetchAndDecrypt(decryptPassword);
       if (decrypted) {
@@ -461,8 +466,9 @@ async function checkSavedSession() {
         showApp();
       }
     } catch (err) {
-      console.warn('Saved session password expired or invalid.');
+      console.warn('Saved session expired or invalid.');
       localStorage.removeItem('journal_password');
+      localStorage.removeItem('visitor_name');
       passwordInput.value = '';
     } finally {
       unlockBtn.disabled = false;
@@ -482,19 +488,25 @@ async function handleLogin(e) {
   const password = passwordInput.value;
   const name = visitorNameInput ? visitorNameInput.value.trim() : '';
 
-  if (!password || !name) return;
+  if (!name) return;
 
   loginError.classList.remove('show');
   unlockBtn.disabled = true;
   unlockBtn.querySelector('span').textContent = 'Decrypting...';
 
   try {
-    // Check if the typed password matches the Super Admin hash or custom user password hash
-    const hash = await sha256(password);
-    const isSuperAdmin = (hash === BLOG_CONFIG.adminPasswordHash);
-    const isCustomUser = (activeUserPasswordHash && hash === activeUserPasswordHash);
-    const decryptPassword = (isSuperAdmin || isCustomUser) ? "thoughts" : password;
+    let isSuperAdmin = false;
+    if (password) {
+      const hash = await sha256(password);
+      isSuperAdmin = (hash === BLOG_CONFIG.adminPasswordHash);
+      if (!isSuperAdmin) {
+        showLoginError('Incorrect admin password. Leave it blank if you are a normal user.');
+        writeAccessLog('Visitor Login', `Blocked (Invalid Admin Password, Name: ${name})`);
+        return;
+      }
+    }
 
+    const decryptPassword = "thoughts";
     const decrypted = await fetchAndDecrypt(decryptPassword);
     if (decrypted) {
       activeDecryptionPassword = decryptPassword;
@@ -519,8 +531,8 @@ async function handleLogin(e) {
       const logType = isSuperAdmin ? 'Admin Login' : 'Visitor Login';
       writeAccessLog(logType, `Success (Name: ${name})`);
     } else {
-      showLoginError('Incorrect password. Please try again.');
-      writeAccessLog('Visitor Login', `Blocked (Invalid Password, Name: ${name})`);
+      showLoginError('System Error: Unable to decrypt with key.');
+      writeAccessLog('Visitor Login', `Blocked (Decryption Failure, Name: ${name})`);
     }
   } catch (err) {
     console.error(err);
@@ -583,6 +595,19 @@ async function showApp() {
   const welcomeUserEl = document.getElementById('welcomeUser');
   if (welcomeUserEl) {
     welcomeUserEl.textContent = `Welcome, ${name}${isAdmin ? ' (Admin)' : ''}`;
+  }
+
+  // Pre-fill and hide comment/feedback author inputs
+  if (commentAuthor) {
+    commentAuthor.value = name;
+    const row = commentAuthor.closest('.form-row');
+    if (row) row.style.display = 'none';
+  }
+  const feedbackAuthor = document.getElementById('feedbackAuthor');
+  if (feedbackAuthor) {
+    feedbackAuthor.value = name;
+    const row = feedbackAuthor.closest('.form-row');
+    if (row) row.style.display = 'none';
   }
 
   if (startupFetchPromise) {
@@ -1959,64 +1984,9 @@ async function deleteComment(commentId) {
 }
 
 // ==========================================================================
-// REGULAR PASSWORD MANAGEMENT
+// REGULAR PASSWORD MANAGEMENT (Obsolete)
 // ==========================================================================
-
-// Update the regular user login password (Admin only)
-async function handleAdminPasswordSubmit(e) {
-  e.preventDefault();
-  if (!newRegularPasswordInput) return;
-
-  const newPassword = newRegularPasswordInput.value.trim();
-  if (!newPassword) return;
-
-  if (!confirm('Are you sure you want to change the password for regular users?')) return;
-
-  const submitBtn = e.target.querySelector('button[type="submit"]');
-  if (submitBtn) {
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Updating...';
-  }
-
-  try {
-    const hash = await sha256(newPassword);
-    const backend = getBackendType();
-
-    if (backend === 'standalone') {
-      const localDynamic = JSON.parse(localStorage.getItem('local_dynamic_posts') || '[]');
-      localDynamic.push({
-        id: Date.now(),
-        encrypted_data: JSON.stringify({ isPasswordHash: true, hash: hash }),
-        created_at: new Date().toISOString()
-      });
-      localStorage.setItem('local_dynamic_posts', JSON.stringify(localDynamic));
-      alert('Regular user password updated locally!');
-      newRegularPasswordInput.value = '';
-      await fetchBackendData();
-    } else if (backend === 'sheets') {
-      await fetch(BLOG_CONFIG.googleSheetsUrl, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'posts',
-          encrypted_data: JSON.stringify({ isPasswordHash: true, hash: hash })
-        })
-      });
-      alert('Regular user password updated successfully in Google Sheets!');
-      newRegularPasswordInput.value = '';
-      setTimeout(fetchBackendData, 1200);
-    }
-  } catch (err) {
-    console.error('Failed to update regular user password:', err);
-    alert('Failed to update password: ' + err.message);
-  } finally {
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Update User Password';
-    }
-  }
-}
+// async function handleAdminPasswordSubmit(e) { ... }
 
 // ==========================================================================
 // VIEWS & FEEDBACK FUNCTIONALITY
