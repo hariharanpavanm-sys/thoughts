@@ -1759,6 +1759,7 @@ async function handleCommentSubmit(e) {
 
     commentText.value = '';
     loadComments(activePost.id);
+    showToast('Reflection added successfully!');
     return;
   }
 
@@ -1778,11 +1779,12 @@ async function handleCommentSubmit(e) {
         })
       });
       commentText.value = '';
+      showToast('Reflection added successfully!');
       // Reload comments after a brief delay for sheets processing
       setTimeout(() => loadComments(activePost.id), 1200);
     } catch (err) {
       console.error('Failed to submit comment to Google Sheets:', err);
-      alert('Failed to connect to Google Sheets. Comment submission failed.');
+      showToast('Failed to connect. Reflection submission failed.');
     }
     return;
   }
@@ -1803,12 +1805,13 @@ async function handleCommentSubmit(e) {
       if (response.ok) {
         commentText.value = '';
         loadComments(activePost.id);
+        showToast('Reflection added successfully!');
       } else {
-        alert('Could not submit comment. Please check database permissions.');
+        showToast('Could not submit reflection. Check permissions.');
       }
     } catch (err) {
       console.error('Failed to submit comment to Supabase:', err);
-      alert('Failed to connect to database. Comment submission failed.');
+      showToast('Failed to connect. Reflection submission failed.');
     }
   }
 }
@@ -2311,7 +2314,7 @@ async function handleFeedbackSubmit(e) {
 
   if (backend === 'standalone') {
     localStorage.setItem('local_feedback', JSON.stringify(allFeedback));
-    alert('Feedback submitted locally!');
+    showToast('Reflections submitted locally!');
     return;
   }
 
@@ -2329,11 +2332,11 @@ async function handleFeedbackSubmit(e) {
           session_id: sessionId
         })
       });
-      alert('Feedback submitted successfully!');
+      showToast('Reflections submitted successfully!');
       setTimeout(fetchBackendData, 1200);
     } catch (err) {
       console.error('Failed to submit feedback to Google Sheets:', err);
-      alert('Failed to connect to Google Sheets. Feedback submission failed.');
+      showToast('Failed to connect. Reflection submission failed.');
     }
     return;
   }
@@ -2421,7 +2424,7 @@ async function handleAdminPublishSubmit(e) {
         created_at: now.toISOString()
       });
       localStorage.setItem('local_dynamic_posts', JSON.stringify(localDynamic));
-      alert('Thought published locally!');
+      showToast('Thought published locally!');
       titleEl.value = '';
       contentEl.value = '';
       await fetchBackendData(); // Reload and render combined feed
@@ -2435,7 +2438,7 @@ async function handleAdminPublishSubmit(e) {
           encrypted_data: encryptedStr
         })
       });
-      alert('Thought published successfully to Google Sheets!');
+      showToast('Thought published successfully!');
       titleEl.value = '';
       contentEl.value = '';
       // Reload combined feed after a brief delay
@@ -2445,7 +2448,7 @@ async function handleAdminPublishSubmit(e) {
     }
   } catch (err) {
     console.error('Failed to publish dynamic post:', err);
-    alert('Failed to publish post: ' + err.message);
+    showToast('Failed to publish post: ' + err.message);
   } finally {
     if (publishBtn) {
       publishBtn.disabled = false;
