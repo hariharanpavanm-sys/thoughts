@@ -2689,6 +2689,7 @@ async function fetchVisitorLocation() {
       const region = data.regionName || '';
       const country = data.countryName || '';
       visitorLocationCache = [city, region, country].filter(Boolean).join(', ');
+      console.log('Resolved visitor location (Primary):', visitorLocationCache);
       if (visitorLocationCache) return;
     }
   } catch (e) {
@@ -2709,9 +2710,10 @@ async function fetchVisitorLocation() {
       const region = data.region || '';
       const country = data.country_name || '';
       visitorLocationCache = [city, region, country].filter(Boolean).join(', ');
+      console.log('Resolved visitor location (Fallback):', visitorLocationCache);
     }
   } catch (e) {
-    console.error('All geolocation APIs failed:', e);
+    console.error('All geolocation APIs failed to resolve location:', e);
   }
 }
 
