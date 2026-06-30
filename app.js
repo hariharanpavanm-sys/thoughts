@@ -545,6 +545,9 @@ async function checkSavedSession() {
         updateAdminVisibility();
         mergeAndRenderFeeds();
         showApp();
+
+        const logType = isSuperAdmin ? 'Admin Auto-Login' : 'Visitor Auto-Login';
+        writeAccessLog(logType, `Success (Session Restored, Name: ${savedName})`);
       }
     } catch (err) {
       console.warn('Saved session expired or invalid.');
@@ -667,7 +670,15 @@ function showLoginError(msg) {
 
 // Handle Logout (Lock)
 function handleLogout() {
-  writeAccessLog('Visitor Logout', 'Success');
+  if (!confirm('Are you sure you want to logout?')) {
+    return;
+  }
+
+  const name = localStorage.getItem('visitor_name') || 'Guest';
+  const isAdmin = localStorage.getItem('admin_mode') === 'true';
+  const logType = isAdmin ? 'Admin Logout' : 'Visitor Logout';
+  writeAccessLog(logType, `Success (Name: ${name})`);
+
   localStorage.removeItem('journal_password');
   decryptedPosts = [];
   passwordInput.value = '';
