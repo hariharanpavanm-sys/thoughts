@@ -2675,6 +2675,7 @@ function setupAdditionalFeatures() {
 
 // Resolve visitor city/country from IP geolocation
 async function fetchVisitorLocation() {
+  // Try FreeIPAPI first
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 2000);
@@ -2688,9 +2689,29 @@ async function fetchVisitorLocation() {
       const region = data.regionName || '';
       const country = data.countryName || '';
       visitorLocationCache = [city, region, country].filter(Boolean).join(', ');
+      if (visitorLocationCache) return;
     }
   } catch (e) {
-    console.error('Failed to fetch visitor location:', e);
+    console.warn('FreeIPAPI failed, trying fallback:', e);
+  }
+
+  // Fallback to IPAPI
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
+
+    const res = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+    clearTimeout(timeoutId);
+
+    if (res.ok) {
+      const data = await res.json();
+      const city = data.city || '';
+      const region = data.region || '';
+      const country = data.country_name || '';
+      visitorLocationCache = [city, region, country].filter(Boolean).join(', ');
+    }
+  } catch (e) {
+    console.error('All geolocation APIs failed:', e);
   }
 }
 
