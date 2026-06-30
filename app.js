@@ -601,12 +601,13 @@ async function handleLogin(e) {
     }
   } catch (err) {
     console.error(err);
+    const errorDetails = `[${err.name}] ${err.message}`;
     if (err.name === 'TypeError' || err.message.includes('fetch')) {
-      showLoginError('System Error: Unable to access or load posts.json.enc. If you are opening index.html directly from a local file path, please run a local web server (e.g. python -m http.server 3000) due to browser CORS policies.');
+      showLoginError(`System Error: Unable to access or load posts.json.enc. (Details: ${errorDetails})`);
     } else if (err.name === 'OperationError' || err.message.includes('decrypt') || err.message.includes('decryption')) {
       showLoginError('Incorrect password. Please try again.');
     } else {
-      showLoginError('System Error: Unable to decrypt the archive. Make sure to run the python encrypt.py script.');
+      showLoginError(`System Error: Unable to decrypt the archive. (Details: ${errorDetails})`);
     }
     writeAccessLog('Visitor Login', `Blocked (System Decryption Failure, Name: ${name})`);
   } finally {
