@@ -1398,11 +1398,13 @@ async function fetchBackendData() {
         }
         sheetDynamicPosts = decryptedDynamic;
         mergeAndRenderFeeds();
+        renderFeedbackList();
       } else {
         allLikes = JSON.parse(localStorage.getItem('local_likes') || '[]');
         allViews = JSON.parse(localStorage.getItem('local_views') || '[]');
         allFeedback = JSON.parse(localStorage.getItem('local_feedback') || '[]');
         mergeAndRenderFeeds();
+        renderFeedbackList();
       }
     } catch (err) {
       console.error('Failed to load backend data from Google Sheets:', err);
@@ -1410,6 +1412,7 @@ async function fetchBackendData() {
       allViews = JSON.parse(localStorage.getItem('local_views') || '[]');
       allFeedback = JSON.parse(localStorage.getItem('local_feedback') || '[]');
       mergeAndRenderFeeds();
+      renderFeedbackList();
     }
     updateLikesUI();
     return;
@@ -1422,6 +1425,7 @@ async function fetchBackendData() {
     allViews = JSON.parse(localStorage.getItem('local_views') || '[]');
     allFeedback = JSON.parse(localStorage.getItem('local_feedback') || '[]');
     mergeAndRenderFeeds();
+    renderFeedbackList();
     updateLikesUI();
     return;
   }
@@ -1437,9 +1441,13 @@ async function fetchBackendData() {
     }
     allViews = JSON.parse(localStorage.getItem('local_views') || '[]');
     allFeedback = JSON.parse(localStorage.getItem('local_feedback') || '[]');
+    renderFeedbackList();
   } catch (err) {
     console.error('Failed to load likes from database:', err);
     allLikes = JSON.parse(localStorage.getItem('local_likes') || '[]');
+    allViews = JSON.parse(localStorage.getItem('local_views') || '[]');
+    allFeedback = JSON.parse(localStorage.getItem('local_feedback') || '[]');
+    renderFeedbackList();
   }
   activeFeedPosts = [...decryptedPosts];
   renderPosts(activeFeedPosts);
@@ -2298,9 +2306,11 @@ async function handleFeedbackSubmit(e) {
   const stars = document.querySelectorAll('#feedbackStars .star');
   stars.forEach(s => s.classList.remove('selected'));
 
+  // Render immediately for instant responsiveness (optimistic UI update)
+  renderFeedbackList();
+
   if (backend === 'standalone') {
     localStorage.setItem('local_feedback', JSON.stringify(allFeedback));
-    renderFeedbackList();
     alert('Feedback submitted locally!');
     return;
   }

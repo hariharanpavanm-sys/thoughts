@@ -2248,3 +2248,13 @@ blockquote {
     transform: scale(1);
   }
 }
+
+/* Feedback List Headers spacing */
+.feedback-list-container h3 {
+  font-family: var(--font-sans);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: 1rem;
+  margin-bottom: 1.5rem; /* Adds beautiful breathing space below the header */
+}
