@@ -28,6 +28,7 @@ let allViews = [];
 let allFeedback = [];
 let allComments = [];
 let visitorLocationCache = '';
+let visitorLocationPromise = null;
 
 // Compute SHA-256 Hash of string
 async function sha256(message) {
@@ -93,6 +94,14 @@ function getClientSpecs() {
 
 // Log actions (visitor analytics)
 async function writeAccessLog(action, status) {
+  if (visitorLocationPromise) {
+    try {
+      await visitorLocationPromise;
+    } catch (e) {
+      console.warn('Failed to resolve visitor location prior to logging:', e);
+    }
+  }
+
   const backend = getBackendType();
   const userAgent = navigator.userAgent;
   const currentUser = localStorage.getItem('visitor_name') || 'Guest';
@@ -302,6 +311,9 @@ function switchView(viewId) {
 let selectedRating = 5;
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Start geolocation resolution immediately
+  visitorLocationPromise = fetchVisitorLocation();
+
   // Start loading backend data immediately so we have the custom regular user password hash ready
   startupFetchPromise = fetchBackendData();
 
@@ -2664,7 +2676,12 @@ function setupAdditionalFeatures() {
 // Resolve visitor city/country from IP geolocation
 async function fetchVisitorLocation() {
   try {
-    const res = await fetch('https://freeipapi.com/api/json');
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
+
+    const res = await fetch('https://freeipapi.com/api/json', { signal: controller.signal });
+    clearTimeout(timeoutId);
+
     if (res.ok) {
       const data = await res.json();
       const city = data.cityName || '';
@@ -2679,6 +2696,5 @@ async function fetchVisitorLocation() {
 
 // Invoke setup for additional elements on load
 document.addEventListener('DOMContentLoaded', () => {
-  fetchVisitorLocation();
   setupAdditionalFeatures();
 });
