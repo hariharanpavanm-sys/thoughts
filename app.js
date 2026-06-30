@@ -594,7 +594,7 @@ async function handleLogin(e) {
   loginError.classList.remove('show');
   unlockBtn.disabled = true;
   unlockBtn.querySelector('span').textContent = 'Decrypting...';
-
+  try {
     const decryptPassword = "thoughts";
     const decrypted = await fetchAndDecrypt(decryptPassword);
     if (decrypted) {
