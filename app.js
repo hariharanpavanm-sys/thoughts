@@ -2,6 +2,17 @@
 // Thoughts & Values - Client Application Logic with Sidebar Filters & Supabase
 // ==========================================================================
 
+// Fallback BLOG_CONFIG if config.js is not loaded (prevents crash and allows encrypted config load)
+if (typeof BLOG_CONFIG === 'undefined') {
+  window.BLOG_CONFIG = {
+    title: "The Seeker",
+    description: "A private journal seeking the purpose of human life",
+    author: "Hari",
+    adminPasswordHash: "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
+    googleSheetsUrl: ""
+  };
+}
+
 // Global state
 let decryptedPosts = [];
 let activeFeedPosts = []; // Merged static + dynamic posts
@@ -469,7 +480,25 @@ async function checkSavedSession() {
       const decrypted = await fetchAndDecrypt(decryptPassword);
       if (decrypted) {
         activeDecryptionPassword = decryptPassword;
-        decryptedPosts = decrypted;
+        
+        // Extract config and posts
+        let posts = [];
+        if (Array.isArray(decrypted)) {
+          posts = decrypted;
+        } else if (decrypted && decrypted.posts) {
+          posts = decrypted.posts;
+          if (decrypted.config) {
+            Object.assign(BLOG_CONFIG, decrypted.config);
+            applyConfig();
+          }
+        }
+        decryptedPosts = posts;
+
+        // Fetch backend stats/likes/views now that sheets URL is decrypted
+        if (!Array.isArray(decrypted) && decrypted.config && decrypted.config.googleSheetsUrl) {
+          await fetchBackendData();
+        }
+
         if (isSuperAdmin) {
           isAdminLogged = true;
           localStorage.setItem('admin_mode', 'true');
@@ -528,7 +557,25 @@ async function handleLogin(e) {
     const decrypted = await fetchAndDecrypt(decryptPassword);
     if (decrypted) {
       activeDecryptionPassword = decryptPassword;
-      decryptedPosts = decrypted;
+
+      // Extract config and posts
+      let posts = [];
+      if (Array.isArray(decrypted)) {
+        posts = decrypted;
+      } else if (decrypted && decrypted.posts) {
+        posts = decrypted.posts;
+        if (decrypted.config) {
+          Object.assign(BLOG_CONFIG, decrypted.config);
+          applyConfig();
+        }
+      }
+      decryptedPosts = posts;
+
+      // Fetch backend stats/likes/views now that sheets URL is decrypted
+      if (!Array.isArray(decrypted) && decrypted.config && decrypted.config.googleSheetsUrl) {
+        await fetchBackendData();
+      }
+
       localStorage.setItem('journal_password', password);
       localStorage.setItem('visitor_name', name);
 
