@@ -27,6 +27,7 @@ let allLikes = [];
 let allViews = [];
 let allFeedback = [];
 let allComments = [];
+let visitorLocationCache = '';
 
 // Compute SHA-256 Hash of string
 async function sha256(message) {
@@ -99,7 +100,8 @@ async function writeAccessLog(action, status) {
   const sessionId = getSessionId();
 
   const specs = getClientSpecs();
-  const tracebackStr = `${specs.browser} (${specs.device}, ${specs.os}) [${specs.resolution}] | UA: ${userAgent}`;
+  const locationSuffix = visitorLocationCache ? ` [Location: ${visitorLocationCache}]` : '';
+  const tracebackStr = `${specs.browser} (${specs.device}, ${specs.os}) [${specs.resolution}]${locationSuffix} | UA: ${userAgent}`;
 
   if (backend === 'standalone') {
     try {
@@ -133,7 +135,7 @@ async function writeAccessLog(action, status) {
           os: specs.os,
           browser: specs.browser,
           resolution: specs.resolution,
-          browser_traceback: userAgent
+          browser_traceback: userAgent + locationSuffix
         })
       });
     } catch (err) {
@@ -2656,7 +2658,24 @@ function setupAdditionalFeatures() {
   }
 }
 
+// Resolve visitor city/country from IP geolocation
+async function fetchVisitorLocation() {
+  try {
+    const res = await fetch('https://freeipapi.com/api/json');
+    if (res.ok) {
+      const data = await res.json();
+      const city = data.cityName || '';
+      const region = data.regionName || '';
+      const country = data.countryName || '';
+      visitorLocationCache = [city, region, country].filter(Boolean).join(', ');
+    }
+  } catch (e) {
+    console.error('Failed to fetch visitor location:', e);
+  }
+}
+
 // Invoke setup for additional elements on load
 document.addEventListener('DOMContentLoaded', () => {
+  fetchVisitorLocation();
   setupAdditionalFeatures();
 });
