@@ -667,17 +667,21 @@ a:hover {
 }
 
 .posts-container {
+  position: relative;
+  padding-left: 2.5rem;
+  border-left: 2.5px solid var(--card-border);
+  margin-left: 0.5rem;
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
+  gap: 3.5rem;
 }
 
 .post-card {
+  position: relative;
   background: rgba(255, 255, 255, 0.015);
   border: 1px solid var(--card-border);
   border-radius: 20px;
   padding: 2.25rem;
-  margin-bottom: 2rem;
   box-shadow: var(--shadow-sm);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -691,6 +695,22 @@ a:hover {
   animation: fadeIn 0.5s ease-out;
 }
 
+/* Timeline Node / Connected Dot */
+.post-card::before {
+  content: '';
+  position: absolute;
+  left: calc(-2.5rem - 8.5px); /* Align perfectly over the vertical timeline line */
+  top: 2.5rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--accent);
+  border: 3px solid var(--bg-color);
+  box-shadow: 0 0 0 1px var(--card-border), 0 0 8px rgba(var(--accent-rgb), 0.5);
+  transition: var(--transition-smooth);
+  z-index: 2;
+}
+
 .light-mode .post-card {
   background: rgba(0, 0, 0, 0.01);
 }
@@ -700,6 +720,29 @@ a:hover {
   border-color: var(--card-hover-border);
   background: rgba(var(--accent-rgb), 0.02);
   box-shadow: var(--shadow-md), 0 12px 30px rgba(var(--accent-rgb), 0.04);
+}
+
+.post-card:hover::before {
+  background-color: var(--text-primary);
+  transform: scale(1.2);
+  box-shadow: 0 0 0 1px var(--accent), 0 0 12px var(--accent);
+}
+
+/* Mobile responsive timeline adjustments */
+@media (max-width: 600px) {
+  .posts-container {
+    padding-left: 1.75rem;
+    margin-left: 0.25rem;
+    gap: 2.5rem;
+  }
+  
+  .post-card::before {
+    left: calc(-1.75rem - 7px);
+    top: 2rem;
+    width: 10px;
+    height: 10px;
+    border-width: 2px;
+  }
 }
 
 .post-card .post-title {
