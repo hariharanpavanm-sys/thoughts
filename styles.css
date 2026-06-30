@@ -352,11 +352,24 @@ a:hover {
   position: relative;
 }
 
+.input-label {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  text-align: left;
+  padding-left: 0.25rem;
+}
+
 .admin-link-wrapper {
   display: flex;
   justify-content: flex-end;
-  margin-top: -0.75rem;
-  margin-bottom: 1rem;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
 }
 
 .admin-toggle-btn {
@@ -1997,11 +2010,11 @@ blockquote {
 }
 
 .blog-footer .tagline {
-  font-family: var(--font-serif);
-  font-size: 1.05rem;
-  font-style: italic;
-  color: var(--text-secondary);
-  opacity: 1; /* Fully opaque and readable */
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-style: normal;
+  color: var(--text-muted);
+  opacity: 0.9;
   margin-top: 0.25rem;
 }
 

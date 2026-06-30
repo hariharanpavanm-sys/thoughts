@@ -14,7 +14,7 @@
     rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=1.0.1">
+  <link rel="stylesheet" href="styles.css?v=1.0.2">
 </head>
 
 <body class="dark-mode">
@@ -50,9 +50,6 @@
         <p class="lock-form-desc">Provide your name to access the journal. Password only required for Admin.</p>
 
         <form id="loginForm" class="login-form">
-          <div class="input-group">
-            <input type="text" id="visitorNameInput" placeholder="Enter your name..." required>
-          </div>
           <div class="admin-link-wrapper">
             <button type="button" id="adminToggleBtn" class="admin-toggle-btn">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 2px;">
@@ -62,7 +59,12 @@
               <span>Admin Access</span>
             </button>
           </div>
+          <div class="input-group">
+            <label for="visitorNameInput" class="input-label">Username</label>
+            <input type="text" id="visitorNameInput" placeholder="Username" required>
+          </div>
           <div class="input-group password-group collapsed" id="passwordGroup">
+            <label for="passwordInput" class="input-label">Password</label>
             <input type="password" id="passwordInput" placeholder="Password (Admin only)..."
               autocomplete="current-password">
           </div>
@@ -585,7 +587,7 @@
 
   <!-- Config and Application Logic Scripts -->
   <script src="config.js"></script>
-  <script src="app.js"></script>
+  <script src="app.js?v=1.0.2"></script>
 </body>
 
 </html>
