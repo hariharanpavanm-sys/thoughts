@@ -352,6 +352,43 @@ a:hover {
   position: relative;
 }
 
+.admin-link-wrapper {
+  text-align: right;
+  margin-top: -0.75rem;
+  margin-bottom: 1rem;
+}
+
+.admin-toggle-link {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-decoration: underline;
+  transition: var(--transition-smooth);
+  opacity: 0.7;
+}
+
+.admin-toggle-link:hover {
+  color: var(--accent);
+  opacity: 1;
+}
+
+.password-group {
+  max-height: 100px;
+  opacity: 1;
+  transform: translateY(0);
+  transition: max-height 0.3s ease, opacity 0.3s ease, transform 0.3s ease, margin-bottom 0.3s ease;
+}
+
+.password-group.collapsed {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-10px);
+  margin-bottom: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+
 .login-form input[type="password"],
 .login-form input[type="text"] {
   width: 100%;

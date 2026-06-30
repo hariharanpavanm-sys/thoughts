@@ -53,7 +53,10 @@
           <div class="input-group">
             <input type="text" id="visitorNameInput" placeholder="Enter your name..." required>
           </div>
-          <div class="input-group">
+          <div class="admin-link-wrapper">
+            <span id="adminToggleLink" class="admin-toggle-link">Admin access?</span>
+          </div>
+          <div class="input-group password-group collapsed" id="passwordGroup">
             <input type="password" id="passwordInput" placeholder="Password (Admin only)..."
               autocomplete="current-password">
           </div>
@@ -88,7 +91,8 @@
               </svg>
             </div>
             <div>
-              <h1 id="blogTitle">The Seeker <span class="title-separator">|</span> <span class="title-tagline">Trace the Source</span></h1>
+              <h1 id="blogTitle">The Seeker <span class="title-separator">|</span> <span class="title-tagline">Trace the
+                  Source</span></h1>
               <p id="blogSubtitle" class="subtitle">A Private Journal</p>
             </div>
           </div>
@@ -456,8 +460,9 @@
     <!-- Footer -->
     <footer class="blog-footer">
       <div class="footer-content">
-        <p>&copy; <span id="currentYear"></span> <span id="footerAuthor">Hari</span>. All rights reserved.</p>
-        <p class="tagline">Knowing is Being</p>
+        <p>&copy; <span id="currentYear"></span> <span id="footerAuthor">Hari</span>. By the grace of Ishvara alone.</p>
+        <p class="tagline">A collection of writings from my WhatsApp notes, compiled here as a blog on SwamiG's
+          suggestion</p>
       </div>
     </footer>
   </div>
@@ -527,7 +532,7 @@
             </svg>
             <span id="modalLikeCountBottom">0</span>
           </button>
-          
+
           <button id="modalShareBtnBottom" class="modal-share-btn-bottom" title="Copy Link to Inquiry">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round">

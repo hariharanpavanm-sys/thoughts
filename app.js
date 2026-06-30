@@ -292,6 +292,26 @@ document.addEventListener('DOMContentLoaded', () => {
   logoutBtn.addEventListener('click', handleLogout);
   themeToggle.addEventListener('click', toggleTheme);
 
+  // Admin password reveal toggle logic
+  const adminToggleLink = document.getElementById('adminToggleLink');
+  const passwordGroup = document.getElementById('passwordGroup');
+  if (adminToggleLink && passwordGroup && passwordInput) {
+    const revealPassword = () => {
+      passwordGroup.classList.remove('collapsed');
+    };
+    const hidePassword = () => {
+      if (document.activeElement !== passwordInput && !passwordInput.value) {
+        passwordGroup.classList.add('collapsed');
+      }
+    };
+    adminToggleLink.addEventListener('mouseenter', revealPassword);
+    adminToggleLink.addEventListener('click', () => {
+      revealPassword();
+      passwordInput.focus();
+    });
+    passwordInput.addEventListener('blur', hidePassword);
+  }
+
   searchInput.addEventListener('input', handleSearch);
 
   // Modal Close Events
