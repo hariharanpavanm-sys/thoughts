@@ -58,6 +58,37 @@ function getBackendType() {
   return 'standalone';
 }
 
+// Parse client browser details for cleaner insights
+function getClientSpecs() {
+  const ua = navigator.userAgent;
+  let device = 'Desktop';
+  let os = 'Unknown OS';
+  let browser = 'Unknown Browser';
+
+  // 1. Detect Device
+  if (/Mobi|Android|iPhone|iPad|iPod|Windows Phone/i.test(ua)) {
+    device = /iPad|Tablet/i.test(ua) ? 'Tablet' : 'Mobile';
+  }
+
+  // 2. Detect OS
+  if (/Windows NT/i.test(ua)) os = 'Windows';
+  else if (/Macintosh|Mac OS X/i.test(ua)) os = 'macOS';
+  else if (/iPhone|iPad|iPod/i.test(ua)) os = 'iOS';
+  else if (/Android/i.test(ua)) os = 'Android';
+  else if (/Linux/i.test(ua)) os = 'Linux';
+
+  // 3. Detect Browser
+  if (/Brave/i.test(navigator.brave ? 'Brave' : '')) browser = 'Brave';
+  else if (/Chrome/i.test(ua) && /Google Inc/i.test(navigator.vendor)) browser = 'Chrome';
+  else if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) browser = 'Safari';
+  else if (/Firefox/i.test(ua)) browser = 'Firefox';
+  else if (/Edg/i.test(ua)) browser = 'Edge';
+  else if (/Trident|MSIE/i.test(ua)) browser = 'Internet Explorer';
+
+  const resolution = `${window.screen.width}x${window.screen.height}`;
+  return { device, os, browser, resolution };
+}
+
 // Log actions (visitor analytics)
 async function writeAccessLog(action, status) {
   const backend = getBackendType();
@@ -65,6 +96,9 @@ async function writeAccessLog(action, status) {
   const currentUser = localStorage.getItem('visitor_name') || 'Guest';
   const activityStr = action + (status ? ' (' + status + ')' : '');
   const sessionId = getSessionId();
+
+  const specs = getClientSpecs();
+  const tracebackStr = `${specs.browser} (${specs.device}, ${specs.os}) [${specs.resolution}] | UA: ${userAgent}`;
 
   if (backend === 'standalone') {
     try {
@@ -74,7 +108,7 @@ async function writeAccessLog(action, status) {
         user: currentUser,
         activity: activityStr,
         session_id: sessionId,
-        browser_traceback: userAgent
+        browser_traceback: tracebackStr
       });
       localStorage.setItem('local_access_logs', JSON.stringify(localLogs.slice(0, 100)));
     } catch (e) {
@@ -94,7 +128,7 @@ async function writeAccessLog(action, status) {
           user: currentUser,
           activity: activityStr,
           session_id: sessionId,
-          browser_traceback: userAgent
+          browser_traceback: tracebackStr
         })
       });
     } catch (err) {
@@ -601,13 +635,12 @@ async function handleLogin(e) {
     }
   } catch (err) {
     console.error(err);
-    const errorDetails = `[${err.name}] ${err.message}`;
     if (err.name === 'TypeError' || err.message.includes('fetch')) {
-      showLoginError(`System Error: Unable to access or load posts.json.enc. (Details: ${errorDetails})`);
+      showLoginError('System Error: Unable to access or load posts.json.enc. If you are opening index.html directly from a local file path, please run a local web server (e.g. python -m http.server 3000) due to browser CORS policies.');
     } else if (err.name === 'OperationError' || err.message.includes('decrypt') || err.message.includes('decryption')) {
       showLoginError('Incorrect password. Please try again.');
     } else {
-      showLoginError(`System Error: Unable to decrypt the archive. (Details: ${errorDetails})`);
+      showLoginError('System Error: Unable to decrypt the archive. Make sure to run the python encrypt.py script.');
     }
     writeAccessLog('Visitor Login', `Blocked (System Decryption Failure, Name: ${name})`);
   } finally {
@@ -1957,12 +1990,20 @@ function renderAdminLogs(logs) {
     const logSession = log.session_id || 'N/A';
     const logBrowser = log.browser_traceback || log.user_agent || 'Unknown';
 
+    let logBrowserDisplay = logBrowser;
+    let logBrowserTooltip = logBrowser;
+    if (logBrowser.includes(' | UA: ')) {
+      const parts = logBrowser.split(' | UA: ');
+      logBrowserDisplay = parts[0];
+      logBrowserTooltip = parts[1];
+    }
+
     row.innerHTML = `
       <td>${timeStr}</td>
       <td><span class="user-badge">${escapeHtml(logUser)}</span></td>
       <td><strong>${escapeHtml(logActivity)}</strong></td>
       <td><code>${escapeHtml(logSession)}</code></td>
-      <td title="${escapeHtml(logBrowser)}">${escapeHtml(truncateString(logBrowser, 50))}</td>
+      <td title="${escapeHtml(logBrowserTooltip)}">${escapeHtml(truncateString(logBrowserDisplay, 50))}</td>
     `;
     adminLogsTableBody.appendChild(row);
   });
