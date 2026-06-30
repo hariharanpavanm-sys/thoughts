@@ -77,7 +77,7 @@ async function writeAccessLog(action, status) {
       await fetch(BLOG_CONFIG.googleSheetsUrl, {
         method: 'POST',
         mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({
           type: 'access_logs',
           user: currentUser,
@@ -1423,7 +1423,7 @@ async function toggleLike(postId) {
         await fetch(BLOG_CONFIG.googleSheetsUrl, {
           method: 'POST',
           mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify({
             type: 'unlike',
             post_id: Number(postId),
@@ -1436,7 +1436,7 @@ async function toggleLike(postId) {
         await fetch(BLOG_CONFIG.googleSheetsUrl, {
           method: 'POST',
           mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify({
             type: 'likes',
             post_id: Number(postId),
@@ -1638,7 +1638,7 @@ async function handleCommentSubmit(e) {
       await fetch(BLOG_CONFIG.googleSheetsUrl, {
         method: 'POST',
         mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({
           type: 'comments',
           post_id: activePost.id,
@@ -2051,7 +2051,7 @@ async function trackPostView(postId) {
       await fetch(BLOG_CONFIG.googleSheetsUrl, {
         method: 'POST',
         mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({
           type: 'views',
           post_id: Number(postId),
@@ -2181,7 +2181,7 @@ async function handleFeedbackSubmit(e) {
       await fetch(BLOG_CONFIG.googleSheetsUrl, {
         method: 'POST',
         mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({
           type: 'feedback',
           author,
@@ -2290,7 +2290,7 @@ async function handleAdminPublishSubmit(e) {
       await fetch(BLOG_CONFIG.googleSheetsUrl, {
         method: 'POST',
         mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({
           type: 'posts',
           encrypted_data: encryptedStr
