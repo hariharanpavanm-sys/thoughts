@@ -517,14 +517,14 @@ async function checkSavedSession() {
         passwordInput.value = savedPassword;
       }
       unlockBtn.disabled = true;
-      unlockBtn.querySelector('span').textContent = 'Decrypting...';
+      unlockBtn.querySelector('span').textContent = 'Authenticating...';
 
       const decryptPassword = "thoughts";
 
       const decrypted = await fetchAndDecrypt(decryptPassword);
       if (decrypted) {
         activeDecryptionPassword = decryptPassword;
-        
+
         // Extract config and posts
         let posts = [];
         if (Array.isArray(decrypted)) {
@@ -593,7 +593,7 @@ async function handleLogin(e) {
 
   loginError.classList.remove('show');
   unlockBtn.disabled = true;
-  unlockBtn.querySelector('span').textContent = 'Decrypting...';
+  unlockBtn.querySelector('span').textContent = 'Authenticating...';
   try {
     const decryptPassword = "thoughts";
     const decrypted = await fetchAndDecrypt(decryptPassword);
