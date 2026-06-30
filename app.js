@@ -26,6 +26,7 @@ let startupFetchPromise = null; // Backend data fetch promise for startup synchr
 let allLikes = [];
 let allViews = [];
 let allFeedback = [];
+let allComments = [];
 
 // Compute SHA-256 Hash of string
 async function sha256(message) {
@@ -1080,6 +1081,12 @@ function renderPosts(postsToRender) {
     likesCountMap[l.post_id] = (likesCountMap[l.post_id] || 0) + 1;
   });
 
+  // Group comments by post_id
+  const commentsCountMap = {};
+  allComments.forEach(c => {
+    commentsCountMap[c.post_id] = (commentsCountMap[c.post_id] || 0) + 1;
+  });
+
   if (sortVal === 'newest') {
     sortedPosts.sort((a, b) => b.id - a.id);
   } else if (sortVal === 'oldest') {
@@ -1102,6 +1109,7 @@ function renderPosts(postsToRender) {
     const readTime = calculateReadTime(post.content);
     const formattedBody = formatPostContent(post.content);
     const viewsCount = viewsCountMap[post.id] || 0;
+    const commentsCount = commentsCountMap[post.id] || 0;
 
     // Combine Date and Time
     const displayTime = post.time ? ` • ${post.time}` : '';
@@ -1113,6 +1121,8 @@ function renderPosts(postsToRender) {
         <span>${readTime}</span>
         <span class="meta-dot">&bull;</span>
         <span>👁️ ${viewsCount} ${viewsCount === 1 ? 'view' : 'views'}</span>
+        <span class="meta-dot">&bull;</span>
+        <span>💬 ${commentsCount} ${commentsCount === 1 ? 'reflection' : 'reflections'}</span>
       </div>
       <h2 class="post-title">${post.title}</h2>
       <div class="post-excerpt">${formattedBody}</div>
@@ -1328,6 +1338,7 @@ async function fetchBackendData() {
     allLikes = JSON.parse(localStorage.getItem('local_likes') || '[]');
     allViews = JSON.parse(localStorage.getItem('local_views') || '[]');
     allFeedback = JSON.parse(localStorage.getItem('local_feedback') || '[]');
+    allComments = JSON.parse(localStorage.getItem('local_comments') || '[]');
 
     // Handle local dynamic posts
     const localDynamic = JSON.parse(localStorage.getItem('local_dynamic_posts') || '[]');
@@ -1371,6 +1382,7 @@ async function fetchBackendData() {
         allLikes = data.likes || [];
         allViews = data.views || [];
         allFeedback = data.feedback || [];
+        allComments = data.comments || [];
 
         // Handle dynamic posts from Google Sheets
         const sheetDynamic = data.posts || [];
@@ -1407,6 +1419,7 @@ async function fetchBackendData() {
         allLikes = JSON.parse(localStorage.getItem('local_likes') || '[]');
         allViews = JSON.parse(localStorage.getItem('local_views') || '[]');
         allFeedback = JSON.parse(localStorage.getItem('local_feedback') || '[]');
+        allComments = JSON.parse(localStorage.getItem('local_comments') || '[]');
         mergeAndRenderFeeds();
         renderFeedbackList();
       }
@@ -1415,6 +1428,7 @@ async function fetchBackendData() {
       allLikes = JSON.parse(localStorage.getItem('local_likes') || '[]');
       allViews = JSON.parse(localStorage.getItem('local_views') || '[]');
       allFeedback = JSON.parse(localStorage.getItem('local_feedback') || '[]');
+      allComments = JSON.parse(localStorage.getItem('local_comments') || '[]');
       mergeAndRenderFeeds();
       renderFeedbackList();
     }
@@ -1428,6 +1442,7 @@ async function fetchBackendData() {
     allLikes = JSON.parse(localStorage.getItem('local_likes') || '[]');
     allViews = JSON.parse(localStorage.getItem('local_views') || '[]');
     allFeedback = JSON.parse(localStorage.getItem('local_feedback') || '[]');
+    allComments = JSON.parse(localStorage.getItem('local_comments') || '[]');
     mergeAndRenderFeeds();
     renderFeedbackList();
     updateLikesUI();
@@ -1443,14 +1458,31 @@ async function fetchBackendData() {
     } else {
       allLikes = JSON.parse(localStorage.getItem('local_likes') || '[]');
     }
+
+    // Fetch comments from Supabase
+    try {
+      const commRes = await fetch(`${BLOG_CONFIG.supabaseUrl}/rest/v1/comments`, {
+        method: 'GET',
+        headers
+      });
+      if (commRes.ok) {
+        allComments = await commRes.json();
+      } else {
+        allComments = JSON.parse(localStorage.getItem('local_comments') || '[]');
+      }
+    } catch (e) {
+      allComments = JSON.parse(localStorage.getItem('local_comments') || '[]');
+    }
+
     allViews = JSON.parse(localStorage.getItem('local_views') || '[]');
     allFeedback = JSON.parse(localStorage.getItem('local_feedback') || '[]');
     renderFeedbackList();
   } catch (err) {
-    console.error('Failed to load likes from database:', err);
+    console.error('Failed to load database from Supabase:', err);
     allLikes = JSON.parse(localStorage.getItem('local_likes') || '[]');
     allViews = JSON.parse(localStorage.getItem('local_views') || '[]');
     allFeedback = JSON.parse(localStorage.getItem('local_feedback') || '[]');
+    allComments = JSON.parse(localStorage.getItem('local_comments') || '[]');
     renderFeedbackList();
   }
   activeFeedPosts = [...decryptedPosts];
@@ -1640,61 +1672,10 @@ async function toggleLike(postId) {
 // COMMENTS FUNCTIONALITY
 // ==========================================================================
 
-// Load comments for a post
-async function loadComments(postId) {
-  commentsList.innerHTML = '<p class="loading-state">Loading comments...</p>';
-  commentCount.textContent = '0';
-
-  const backend = getBackendType();
-
-  if (backend === 'standalone') {
-    const allComments = JSON.parse(localStorage.getItem('local_comments') || '[]');
-    const postComments = allComments.filter(c => Number(c.post_id) === Number(postId));
-    renderComments(postComments);
-    return;
-  }
-
-  if (backend === 'sheets') {
-    try {
-      const response = await fetch(BLOG_CONFIG.googleSheetsUrl);
-      if (response.ok) {
-        const data = await response.json();
-        const postComments = (data.comments || []).filter(c => Number(c.post_id) === Number(postId));
-        renderComments(postComments);
-      } else {
-        commentsList.innerHTML = '<p class="text-error">Could not connect to the comments server.</p>';
-      }
-    } catch (err) {
-      console.error('Failed to load comments from Google Sheets:', err);
-      commentsList.innerHTML = '<p class="text-error">Database connection failed. Running comments locally.</p>';
-    }
-    return;
-  }
-
-  // Supabase mode
-  const headers = getSupabaseHeaders();
-  if (!headers) {
-    const allComments = JSON.parse(localStorage.getItem('local_comments') || '[]');
-    const postComments = allComments.filter(c => Number(c.post_id) === Number(postId));
-    renderComments(postComments);
-    return;
-  }
-
-  try {
-    const response = await fetch(`${BLOG_CONFIG.supabaseUrl}/rest/v1/comments?post_id=eq.${postId}&order=created_at.asc`, {
-      method: 'GET',
-      headers
-    });
-    if (response.ok) {
-      const data = await response.json();
-      renderComments(data);
-    } else {
-      commentsList.innerHTML = '<p class="text-error">Could not connect to the comments server.</p>';
-    }
-  } catch (err) {
-    console.error('Failed to load comments from Supabase:', err);
-    commentsList.innerHTML = '<p class="text-error">Database connection failed. Running comments locally.</p>';
-  }
+// Load comments for a post (Loads instantly from memory)
+function loadComments(postId) {
+  const postComments = allComments.filter(c => Number(c.post_id) === Number(postId));
+  renderComments(postComments);
 }
 
 // Render comments in UI
@@ -1745,24 +1726,26 @@ async function handleCommentSubmit(e) {
 
   if (!author || !text) return;
 
+  const newComment = {
+    id: Date.now(),
+    post_id: activePost.id,
+    post_title: activePost.title,
+    author,
+    text,
+    created_at: new Date().toISOString(),
+    session_id: sessionId
+  };
+
+  // Push to local array for instant rendering (optimistic UI update)
+  allComments.push(newComment);
+  commentText.value = '';
+  loadComments(activePost.id);
+  refreshCurrentFeed();
+
   const backend = getBackendType();
 
   if (backend === 'standalone') {
-    const allComments = JSON.parse(localStorage.getItem('local_comments') || '[]');
-    const newComment = {
-      id: Date.now(),
-      post_id: activePost.id,
-      post_title: activePost.title,
-      author,
-      text,
-      created_at: new Date().toISOString(),
-      session_id: sessionId
-    };
-    allComments.push(newComment);
     localStorage.setItem('local_comments', JSON.stringify(allComments));
-
-    commentText.value = '';
-    loadComments(activePost.id);
     showToast('Reflection added successfully!');
     return;
   }
@@ -1782,10 +1765,9 @@ async function handleCommentSubmit(e) {
           session_id: sessionId
         })
       });
-      commentText.value = '';
       showToast('Reflection added successfully!');
-      // Reload comments after a brief delay for sheets processing
-      setTimeout(() => loadComments(activePost.id), 1200);
+      // Sync from sheets to fetch final timestamp/IDs
+      setTimeout(fetchBackendData, 1200);
     } catch (err) {
       console.error('Failed to submit comment to Google Sheets:', err);
       showToast('Failed to connect. Reflection submission failed.');
@@ -1807,8 +1789,6 @@ async function handleCommentSubmit(e) {
         })
       });
       if (response.ok) {
-        commentText.value = '';
-        loadComments(activePost.id);
         showToast('Reflection added successfully!');
       } else {
         showToast('Could not submit reflection. Check permissions.');
