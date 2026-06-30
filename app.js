@@ -100,8 +100,7 @@ async function writeAccessLog(action, status) {
   const sessionId = getSessionId();
 
   const specs = getClientSpecs();
-  const locationSuffix = visitorLocationCache ? ` [Location: ${visitorLocationCache}]` : '';
-  const tracebackStr = `${specs.browser} (${specs.device}, ${specs.os}) [${specs.resolution}]${locationSuffix} | UA: ${userAgent}`;
+  const tracebackStr = `${specs.browser} (${specs.device}, ${specs.os}) [${specs.resolution}] | UA: ${userAgent}`;
 
   if (backend === 'standalone') {
     try {
@@ -111,7 +110,8 @@ async function writeAccessLog(action, status) {
         user: currentUser,
         activity: activityStr,
         session_id: sessionId,
-        browser_traceback: tracebackStr
+        browser_traceback: tracebackStr,
+        location: visitorLocationCache
       });
       localStorage.setItem('local_access_logs', JSON.stringify(localLogs.slice(0, 100)));
     } catch (e) {
@@ -135,7 +135,8 @@ async function writeAccessLog(action, status) {
           os: specs.os,
           browser: specs.browser,
           resolution: specs.resolution,
-          browser_traceback: userAgent + locationSuffix
+          browser_traceback: userAgent,
+          location: visitorLocationCache
         })
       });
     } catch (err) {
@@ -2020,7 +2021,7 @@ function renderAdminLogs(logs) {
   adminLogsTableBody.innerHTML = '';
 
   if (logs.length === 0) {
-    adminLogsTableBody.innerHTML = '<tr><td colspan="5" class="text-center">No logs recorded yet.</td></tr>';
+    adminLogsTableBody.innerHTML = '<tr><td colspan="6" class="text-center">No logs recorded yet.</td></tr>';
     return;
   }
 
@@ -2040,6 +2041,7 @@ function renderAdminLogs(logs) {
     const logActivity = log.activity || log.action || 'Unknown Action';
     const logSession = log.session_id || 'N/A';
     const logBrowser = log.browser_traceback || log.user_agent || 'Unknown';
+    const logLocation = log.location || 'Unknown';
 
     let logBrowserDisplay = logBrowser;
     let logBrowserTooltip = logBrowser;
@@ -2055,6 +2057,7 @@ function renderAdminLogs(logs) {
       <td><strong>${escapeHtml(logActivity)}</strong></td>
       <td><code>${escapeHtml(logSession)}</code></td>
       <td title="${escapeHtml(logBrowserTooltip)}">${escapeHtml(truncateString(logBrowserDisplay, 50))}</td>
+      <td><span class="location-badge">${escapeHtml(logLocation)}</span></td>
     `;
     adminLogsTableBody.appendChild(row);
   });
