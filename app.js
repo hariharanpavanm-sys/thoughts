@@ -2597,22 +2597,13 @@ function setupAdditionalFeatures() {
         scrollNavGroup.classList.remove('show');
       }
 
-      // 2. Update reading progress bar width & vertical timeline highlighting
+      // 2. Update reading progress bar width
       const totalScrollable = scrollHeight - clientHeight;
       if (totalScrollable > 0) {
         const percentage = (scrollPos / totalScrollable) * 100;
         progressBar.style.width = percentage + '%';
-        
-        const postsContainer = document.getElementById('postsContainer');
-        if (postsContainer) {
-          postsContainer.style.setProperty('--timeline-progress', percentage + '%');
-        }
       } else {
         progressBar.style.width = '0%';
-        const postsContainer = document.getElementById('postsContainer');
-        if (postsContainer) {
-          postsContainer.style.setProperty('--timeline-progress', '0%');
-        }
       }
     };
 
