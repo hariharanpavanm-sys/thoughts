@@ -676,6 +676,20 @@ a:hover {
   gap: 3.5rem;
 }
 
+/* Timeline scroll highlight progress line */
+.posts-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -2.5px; /* Cover the border-left line precisely */
+  width: 2.5px;
+  height: var(--timeline-progress, 0%);
+  background: linear-gradient(to bottom, var(--accent), var(--accent-hover));
+  z-index: 1;
+  pointer-events: none;
+  transition: height 0.1s ease-out;
+}
+
 .post-card {
   position: relative;
   background: rgba(255, 255, 255, 0.015);
@@ -2300,4 +2314,34 @@ blockquote {
   color: var(--text-primary);
   margin-top: 1rem;
   margin-bottom: 1.5rem; /* Adds beautiful breathing space below the header */
+}
+
+/* Custom Premium Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(var(--accent-rgb), 0.15);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: var(--transition-fast);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--accent-rgb), 0.45);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--accent-rgb), 0.15) transparent;
 }
