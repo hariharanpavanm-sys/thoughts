@@ -5,7 +5,7 @@
 // Fallback BLOG_CONFIG if config.js is not loaded (prevents crash and allows encrypted config load)
 if (typeof BLOG_CONFIG === 'undefined') {
   window.BLOG_CONFIG = {
-    title: "The Seeker",
+    title: "The Quest",
     description: "A private journal seeking the purpose of human life",
     author: "Hari",
     adminPasswordHash: "",
@@ -463,7 +463,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function applyConfig() {
   if (typeof BLOG_CONFIG !== 'undefined') {
     document.title = BLOG_CONFIG.title;
-    blogTitleEl.innerHTML = `${BLOG_CONFIG.title} <span class="title-separator">|</span> <span class="title-tagline">Trace the Source</span>`;
+    blogTitleEl.innerHTML = `${BLOG_CONFIG.title} <span class="title-separator">|</span> <span class="title-tagline">Abide in the source</span>`;
     blogSubtitleEl.textContent = BLOG_CONFIG.description;
     footerAuthorSpan.textContent = BLOG_CONFIG.author;
     if (BLOG_CONFIG.defaultPasswordPlaceholder) {
