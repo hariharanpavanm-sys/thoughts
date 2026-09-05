@@ -328,6 +328,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Set current year in footer
   currentYearSpan.textContent = new Date().getFullYear();
+  const loginCurrentYear = document.getElementById('loginCurrentYear');
+  if (loginCurrentYear) {
+    loginCurrentYear.textContent = new Date().getFullYear();
+  }
 
   // Set theme from localStorage or fallback to dark
   const savedTheme = localStorage.getItem('theme');
@@ -484,6 +488,10 @@ function applyConfig() {
     blogTitleEl.innerHTML = `${BLOG_CONFIG.title} <span class="title-separator">|</span> <span class="title-tagline">Abide in the source</span>`;
     blogSubtitleEl.textContent = BLOG_CONFIG.description;
     footerAuthorSpan.textContent = BLOG_CONFIG.author;
+    const loginAuthor = document.getElementById('loginAuthor');
+    if (loginAuthor && BLOG_CONFIG.author) {
+      loginAuthor.textContent = BLOG_CONFIG.author;
+    }
     if (BLOG_CONFIG.defaultPasswordPlaceholder) {
       passwordInput.placeholder = BLOG_CONFIG.defaultPasswordPlaceholder;
     }
@@ -928,6 +936,49 @@ function arrayBufferToBase64(buffer) {
   return window.btoa(binary);
 }
 
+// Truncate post content to create a clean feed preview excerpt
+function getPostExcerpt(text, maxLength = 360) {
+  if (!text) return '';
+  const clean = text.trim();
+  if (clean.length <= maxLength) {
+    return clean;
+  }
+
+  // Preserve image attachments if at the start
+  let prefix = '';
+  let restText = clean;
+  const imgMatch = clean.match(/^(\s*<attached:[^>]+>\s*)/i);
+  if (imgMatch) {
+    prefix = imgMatch[1].trim() + '\n\n';
+    restText = clean.substring(imgMatch[0].length).trim();
+  }
+
+  // Split into paragraphs
+  const paragraphs = restText.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+  let excerpt = '';
+
+  if (paragraphs.length > 0) {
+    if (paragraphs[0].length >= 220) {
+      excerpt = paragraphs[0];
+    } else if (paragraphs.length > 1) {
+      excerpt = paragraphs[0] + '\n\n' + paragraphs[1];
+    } else {
+      excerpt = paragraphs[0];
+    }
+  } else {
+    excerpt = restText;
+  }
+
+  if (excerpt.length > maxLength) {
+    const cut = excerpt.lastIndexOf(' ', maxLength);
+    excerpt = (cut > 60 ? excerpt.slice(0, cut) : excerpt.slice(0, maxLength)).trim() + '...';
+  } else if (restText.length > excerpt.length) {
+    excerpt = excerpt.trim() + '...';
+  }
+
+  return prefix + excerpt;
+}
+
 // Formatting posts: parse custom WhatsApp markup to HTML
 function formatPostContent(text) {
   if (!text) return '';
@@ -1123,7 +1174,8 @@ function renderPosts(postsToRender) {
 
     const formattedDate = formatDate(post.date);
     const readTime = calculateReadTime(post.content);
-    const formattedBody = formatPostContent(post.content);
+    const excerptText = getPostExcerpt(post.content);
+    const formattedExcerpt = formatPostContent(excerptText);
     const viewsCount = viewsCountMap[post.id] || 0;
     const commentsCount = commentsCountMap[post.id] || 0;
 
@@ -1140,8 +1192,8 @@ function renderPosts(postsToRender) {
         <span class="meta-dot">&bull;</span>
         <span>💬 ${commentsCount} ${commentsCount === 1 ? 'reflection' : 'reflections'}</span>
       </div>
-      <h2 class="post-title">${post.title}</h2>
-      <div class="post-excerpt">${formattedBody}</div>
+      <h2 class="post-title" style="cursor: pointer;">${post.title}</h2>
+      <div class="post-excerpt">${formattedExcerpt}</div>
       <div class="post-card-footer">
         <button class="read-more-btn" data-id="${post.id}">
           <span>Unfold Inquiry</span>
@@ -1175,6 +1227,10 @@ function renderPosts(postsToRender) {
 
     // Setup click handlers for reading mode
     card.querySelector('.read-more-btn').addEventListener('click', () => openReader(post));
+    const titleEl = card.querySelector('.post-title');
+    if (titleEl) {
+      titleEl.addEventListener('click', () => openReader(post));
+    }
 
     // Setup click handler for share button
     card.querySelector('.share-btn').addEventListener('click', (e) => {
